@@ -1,0 +1,8 @@
+# This repository is rooted at ~/Desktop, which holds personal files, and it is
+# pushed to a PUBLIC GitHub repo. Ignore everything by default and opt in only
+# to the directories that are meant to be published.
+/*
+
+!/.gitignore
+!/.github/
+!/kilo/
