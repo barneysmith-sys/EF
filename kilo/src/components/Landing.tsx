@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { Wordmark, Segmented, Button } from "./ui";
-import { GEOGRAPHIES, geographyById, MAP_W, MAP_H, pathGen, STATE_FEATURES, project } from "../lib/geo";
-import { PATHWAYS } from "../data/pathways";
+import { useRef } from "react";
+import { Segmented, Button } from "./ui";
+import Opening from "./Opening";
+import { GEOGRAPHIES, geographyById } from "../lib/geo";
 import type { SearchCriteria, Flexibility, Reliability } from "../lib/search";
 import { QUARTER_OPTIONS } from "../lib/search";
 
@@ -28,38 +28,16 @@ interface Props {
 
 export default function Landing({ criteria, onChange, onSearch, searching }: Props) {
   const geo = geographyById(criteria.geographyId);
-
-  // Faint site markers on the backdrop map — hints at what the search will return.
-  const backdropSites = useMemo(
-    () => PATHWAYS.map((p) => project(p.coords)).filter((c): c is [number, number] => c !== null),
-    [],
-  );
+  const stageRef = useRef<HTMLElement>(null);
 
   return (
     <div className="landing">
-      <svg className="landing-map" viewBox={`0 0 ${MAP_W} ${MAP_H}`} aria-hidden>
-        {STATE_FEATURES.map((f, i) => (
-          <path key={i} d={pathGen(f) ?? ""} />
-        ))}
-        {backdropSites.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="3.5" className="landing-map-site" />
-        ))}
-      </svg>
+      <Opening criteria={criteria} onCompose={() => stageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
 
-      <header className="landing-top">
-        <Wordmark size={19} />
-        <div className="landing-top-right">
-          <span className="demo-chip">Demo prototype · mock data</span>
-        </div>
-      </header>
-
-      <main className="landing-main">
-        <div className="landing-hero">
-          <div className="landing-mark">
-            <Wordmark size={58} />
-          </div>
-          <h1 className="landing-headline">Find power.</h1>
-          <p className="landing-sub">Search, compare and secure large-scale electricity capacity.</p>
+      <main className="landing-main" ref={stageRef} id="kilo-search">
+        <div className="stage-copy">
+          <p className="stage-kicker">The requirement</p>
+          <h2 className="stage-title">Where can this load actually be energized.</h2>
         </div>
 
         <section

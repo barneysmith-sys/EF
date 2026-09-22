@@ -6,6 +6,7 @@ import "./styles/tokens.css";
 import "./styles/shell.css";
 import "./styles/map.css";
 import "./styles/landing.css";
+import "./styles/opening.css";
 import "./styles/search.css";
 import "./styles/detail.css";
 import "./styles/request.css";

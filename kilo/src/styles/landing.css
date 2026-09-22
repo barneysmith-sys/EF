@@ -1,10 +1,12 @@
 .landing {
   position: relative;
-  min-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   min-width: 1080px;
+  background: #120e0c;
+  scroll-behavior: smooth;
 }
 
 /* Faint continental backdrop — establishes the domain without decoration */
@@ -51,11 +53,38 @@
 }
 
 .landing-main {
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 64px 26px 40px;
+  padding: 88px 26px 48px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(240, 120, 40, 0.08), transparent 60%),
+    #120e0c;
+}
+
+.stage-copy {
+  width: 100%;
+  max-width: 940px;
+  margin-bottom: 28px;
+}
+.stage-kicker {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f07828;
+}
+.stage-title {
+  margin: 0;
+  max-width: 16em;
+  font-family: "Newsreader", "Iowan Old Style", Georgia, serif;
+  font-weight: 500;
+  font-size: 44px;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: #f4efe8;
 }
 
 /* ─── Hero ─── */

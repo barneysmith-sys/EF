@@ -1,0 +1,323 @@
+/* Opening — a scroll-driven dusk, then the requirement.
+   Motion is driven by custom properties set from the scroll position:
+   --pan 0→1 brings the hill up, --night 0→1 lets the day go. */
+
+.opening {
+  --px: 0;
+  --py: 0;
+  --pan: 0;
+  --night: 0;
+  position: relative;
+  flex: none;
+  height: 280vh;
+  background: #120e0c;
+}
+
+.opening-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  color: #f6f1ea;
+}
+
+.opening-scene {
+  position: absolute;
+  inset: 0;
+}
+
+.skyline {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.opening-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 14, 12, 0) 0%,
+    rgba(18, 14, 12, 0.08) 30%,
+    rgba(18, 14, 12, 0.55) 52%,
+    rgba(18, 14, 12, 0.92) 70%,
+    #120e0c 86%
+  );
+  opacity: var(--night);
+}
+
+/* ─── Layers. Pointer parallax plus the scroll pan. ─── */
+
+.layer {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.layer-sun {
+  transform: translate3d(
+    calc(var(--px) * 46px),
+    calc(var(--py) * 22px + var(--pan) * 54px + var(--night) * 80px),
+    0
+  );
+  opacity: calc(1 - var(--night) * 0.85);
+}
+
+.layer-far {
+  transform: translate3d(calc(var(--px) * -10px), calc(var(--py) * -6px + var(--pan) * -18px), 0);
+}
+
+.layer-city {
+  transform: translate3d(calc(var(--px) * -16px), calc(var(--py) * -10px + var(--pan) * -28px), 0);
+}
+
+.layer-low {
+  transform: translate3d(calc(var(--px) * -22px), calc(var(--py) * -12px + var(--pan) * -36px), 0);
+}
+
+.layer-back-clouds {
+  transform: translate3d(calc(var(--px) * 20px), calc(var(--py) * 10px + var(--pan) * -10px), 0);
+}
+
+.layer-clouds {
+  transform: translate3d(calc(var(--px) * 34px), calc(var(--py) * 14px + var(--pan) * -16px), 0);
+}
+
+.layer-hill {
+  transform: translate3d(
+    calc(var(--px) * -26px),
+    calc(120px - var(--pan) * 150px + var(--py) * 16px),
+    0
+  );
+}
+
+.drift {
+  animation: opening-drift 46s ease-in-out infinite alternate;
+}
+.drift-slow {
+  animation-duration: 72s;
+  animation-direction: alternate-reverse;
+}
+@keyframes opening-drift {
+  from { transform: translateX(-22px); }
+  to { transform: translateX(26px); }
+}
+
+.win-lit {
+  opacity: calc(0.55 + var(--night) * 0.45);
+}
+.win-flick {
+  animation: opening-flicker 6.8s ease-in-out infinite;
+}
+@keyframes opening-flicker {
+  0%, 42%, 100% { opacity: 1; }
+  48% { opacity: 0.25; }
+  56% { opacity: 0.9; }
+  62% { opacity: 0.4; }
+  70% { opacity: 1; }
+}
+.sky-beacon {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: opening-beacon 2.8s ease-in-out infinite;
+}
+@keyframes opening-beacon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* ─── Chrome and type ─── */
+
+.opening-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  color: #f7f3ee;
+  opacity: calc(1 - var(--night) * 0.35);
+}
+.opening-bar .wordmark,
+.opening-bar .wordmark-glyph {
+  color: #f7f3ee;
+}
+.opening-bar .wordmark-text {
+  letter-spacing: 0.18em;
+}
+.opening-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(247, 243, 238, 0.78);
+  border: 1px solid rgba(247, 243, 238, 0.28);
+  padding: 5px 8px;
+  border-radius: 2px;
+}
+
+.opening-title-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  padding: 0 8vw;
+  opacity: calc(1 - var(--night) * 1.35);
+  transform: translate3d(calc(var(--px) * -8px), calc(var(--night) * -28px + var(--py) * 6px), 0);
+}
+.opening-title {
+  margin: 0;
+  text-align: center;
+  font-family: "Newsreader", "Iowan Old Style", Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(68px, 7.6vw, 124px);
+  line-height: 0.9;
+  letter-spacing: -0.028em;
+  color: #f7f4ef;
+  text-shadow: 0 2px 28px rgba(40, 18, 8, 0.28);
+  font-optical-sizing: auto;
+}
+.opening-title span {
+  display: block;
+  animation: kilo-fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.opening-title span:last-child {
+  animation-delay: 0.14s;
+}
+
+.opening-reveal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 11vh;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 24px;
+  gap: 22px;
+  opacity: clamp(0, calc((var(--night) - 0.42) * 2.6), 1);
+  transform: translateY(calc((1 - var(--night)) * 18px));
+  pointer-events: none;
+}
+.opening.is-open .opening-cta {
+  pointer-events: auto;
+}
+.opening-meta {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(246, 236, 224, 0.72);
+}
+.opening-meta i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f07828;
+  display: block;
+}
+.opening-lead {
+  margin: 0;
+  max-width: 640px;
+  font-family: "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: 23px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: #f3ece4;
+}
+.opening-cta {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #f07828;
+  color: #2a140c;
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.opening-cta:hover {
+  background: #ff8a3d;
+}
+.opening-cta:active {
+  transform: translateY(1px);
+}
+
+.opening-scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: rgba(247, 243, 238, 0.8);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: calc(1 - var(--night) * 2.4);
+  pointer-events: auto;
+}
+.opening-scroll-line {
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(to bottom, rgba(247, 243, 238, 0.8), transparent);
+  animation: opening-cue 1.8s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes opening-cue {
+  0% { transform: scaleY(0.3); opacity: 0.3; }
+  50% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.3); opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening {
+    height: auto;
+  }
+  .opening-sticky {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+  }
+  .drift,
+  .win-flick,
+  .sky-beacon,
+  .opening-scroll-line,
+  .opening-title span {
+    animation: none;
+  }
+  .layer-hill {
+    transform: translate3d(0, 20px, 0);
+  }
+  .opening-reveal,
+  .opening-scroll {
+    display: none;
+  }
+}
