@@ -1,0 +1,246 @@
+.map-wrap {
+  position: relative;
+  height: 100%;
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ─── Geography ─── */
+
+.map-state {
+  fill: #0d1015;
+  stroke: none;
+  transition: fill 0.25s ease;
+}
+.map-state.in-scope {
+  fill: #141920;
+}
+.map-state.has-site.in-scope {
+  fill: #1a212a;
+}
+
+.map-mesh {
+  fill: none;
+  stroke: #232a34;
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+.map-outline {
+  fill: none;
+  stroke: #2f3844;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ─── Transmission ties ─── */
+
+.tie-line {
+  stroke: #2e3944;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.2s;
+}
+.tie-node {
+  fill: #2e3944;
+  transition: fill 0.2s;
+}
+.tie.active .tie-line {
+  stroke: var(--signal);
+  opacity: 0.85;
+  animation: kilo-dash 1.1s linear infinite;
+}
+.tie.active .tie-node {
+  fill: var(--signal);
+}
+
+/* ─── Site markers ─── */
+
+.site {
+  cursor: pointer;
+}
+.site-hit {
+  fill: transparent;
+}
+.site-halo {
+  fill: none;
+  stroke: rgba(255, 176, 32, 0.22);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.2s;
+}
+.site-core {
+  fill: rgba(255, 176, 32, 0.16);
+  stroke: var(--signal);
+  stroke-width: 1.3;
+  vector-effect: non-scaling-stroke;
+  transition: fill 0.2s;
+}
+.site-pip {
+  fill: var(--signal);
+}
+.site-pulse {
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transform-origin: center;
+  animation: kilo-pulse 2s ease-out infinite;
+}
+.site-rank {
+  fill: var(--text-tertiary);
+  font-size: 8.5px;
+  font-weight: 600;
+  text-anchor: middle;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transition: fill 0.2s;
+}
+.site:hover .site-core,
+.site.selected .site-core {
+  fill: rgba(255, 176, 32, 0.4);
+}
+.site:hover .site-halo,
+.site.selected .site-halo {
+  stroke: rgba(255, 176, 32, 0.5);
+}
+.site:hover .site-rank,
+.site.selected .site-rank {
+  fill: var(--signal);
+}
+
+/* ─── Callout ─── */
+
+.callout {
+  pointer-events: none;
+  animation: kilo-fade 0.14s ease;
+}
+.callout-bg {
+  fill: rgba(8, 9, 11, 0.94);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.callout-edge {
+  stroke: var(--signal);
+  stroke-width: 2;
+}
+.callout-state {
+  fill: var(--text-tertiary);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+.callout-mw {
+  fill: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+}
+.callout-sub {
+  fill: var(--text-tertiary);
+  font-size: 9px;
+}
+
+/* ─── Map chrome ─── */
+
+.map-legend {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(8, 9, 11, 0.82);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(6px);
+}
+.map-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.legend-swatch {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+}
+.legend-swatch.site {
+  background: rgba(255, 176, 32, 0.3);
+  border: 1px solid var(--signal);
+}
+.legend-swatch.tie {
+  height: 0;
+  border-radius: 0;
+  border-top: 1px dashed #4a5563;
+  width: 11px;
+}
+.legend-swatch.scope {
+  border-radius: 1px;
+  background: #1a212a;
+  border: 1px solid #2f3844;
+}
+
+.map-readout {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-disabled);
+  background: rgba(8, 9, 11, 0.82);
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.map-corner {
+  position: absolute;
+  top: 14px;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-disabled);
+}
+.map-corner.tl {
+  left: 16px;
+}
+.map-corner.tr {
+  right: 16px;
+}
+
+/* Out-of-geography markers */
+.site.muted .site-core {
+  fill: rgba(150, 156, 166, 0.12);
+  stroke: #6b7480;
+}
+.site.muted .site-pip {
+  fill: #8a939e;
+}
+.site.muted .site-halo {
+  stroke: rgba(150, 156, 166, 0.16);
+}
+.site.muted:hover .site-core,
+.site.muted.selected .site-core {
+  fill: rgba(150, 156, 166, 0.3);
+}
+
+/* Embedded mini-maps carry their own panel chrome, so suppress the map's own. */
+.dmini-map-canvas .map-legend,
+.dmini-map-canvas .map-readout,
+.dmini-map-canvas .map-corner,
+.projmap-canvas .map-legend,
+.projmap-canvas .map-readout,
+.projmap-canvas .map-corner {
+  display: none;
+}
