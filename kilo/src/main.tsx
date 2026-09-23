@@ -11,6 +11,7 @@ import "./styles/search.css";
 import "./styles/detail.css";
 import "./styles/request.css";
 import "./styles/pages.css";
+import "./styles/live.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

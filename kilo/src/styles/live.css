@@ -1,0 +1,235 @@
+/* Live wholesale tape. Observed prints sit apart from modeled pathway prices. */
+
+.liveref {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #0c1210;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.livedot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-disabled);
+  align-self: center;
+  flex: none;
+}
+.livedot.on {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.15);
+}
+.live-dot.idle {
+  background: var(--text-disabled);
+}
+.live-dot.idle::after {
+  display: none;
+}
+.liveref-kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ok);
+}
+.liveref-text b {
+  color: var(--text-primary);
+  font-weight: 560;
+}
+.liveref-muted,
+.liveref-note {
+  color: var(--text-tertiary);
+}
+.liveref-note {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+.livetape {
+  padding: 16px 18px 14px;
+  margin-bottom: 28px;
+}
+.livetape-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.livetape-head h3 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+}
+.livetape-source {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ok);
+}
+.livetape-figs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.livetape-val {
+  margin-top: 4px;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.livetape-val span {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 0;
+}
+.livetape-val.signal {
+  color: var(--signal);
+}
+.livetape-hint {
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+}
+.livetape-error {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--warn);
+}
+
+.fuel {
+  margin-top: 16px;
+}
+.fuelbar {
+  display: flex;
+  height: 8px;
+  background: var(--bg-active);
+  overflow: hidden;
+}
+.fuelbar span,
+.fuellegend i {
+  display: block;
+}
+.fuelbar span.coal,
+.fuellegend i.coal { background: #8d7b6b; }
+.fuelbar span.gas,
+.fuellegend i.gas { background: #e0a15a; }
+.fuelbar span.nuclear,
+.fuellegend i.nuclear { background: #7f93b5; }
+.fuelbar span.wind,
+.fuellegend i.wind { background: #6eae8a; }
+.fuelbar span.solar,
+.fuellegend i.solar { background: var(--signal); }
+.fuelbar span.other,
+.fuellegend i.other { background: #3c4450; }
+.fuellegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.fuellegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fuellegend i {
+  width: 7px;
+  height: 7px;
+}
+.fuellegend b {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.hubs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-faint);
+}
+.hub {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 12px;
+}
+.hub-name {
+  color: var(--text-tertiary);
+}
+.hub .num {
+  color: var(--text-primary);
+}
+.hub-note {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.feeds {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.feeds ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.feeds li {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.feeds b {
+  color: var(--text-primary);
+  font-weight: 560;
+}
+.feed-state {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding-top: 3px;
+}
+.feed-state.on { color: var(--ok); }
+.feed-state.bad { color: var(--warn); }
+.eiademand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.eiademand b {
+  color: var(--text-primary);
+  font-weight: 560;
+}
+
+.dside-live {
+  align-items: flex-start;
+}
+.dside-live-note {
+  display: block;
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  max-width: 28em;
+}

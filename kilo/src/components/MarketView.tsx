@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, SectionHead, Sparkline } from "./ui";
+import LiveTape from "./LiveTape";
 import { MARKET_REGIONS, type MarketRegion } from "../data/portfolio";
 
 const HEADROOM_TONE: Record<MarketRegion["headroom"], string> = {
@@ -29,6 +30,7 @@ export default function MarketView({ onSearch }: { onSearch: () => void }) {
 
       <div className="page">
         <div className="page-inner">
+          <LiveTape />
           <SectionHead
             eyebrow="Regional conditions"
             title="Where megawatts are actually deliverable"
@@ -192,9 +194,9 @@ export default function MarketView({ onSearch }: { onSearch: () => void }) {
           <footer className="detail-foot">
             <span className="demo-chip">Demo data</span>
             <p>
-              Regional prices, queue volumes, energization lags, carbon intensities and headroom
-              assessments are synthetic figures produced for this prototype. They are not sourced
-              from PJM, ERCOT, MISO, any utility or any market operator.
+              The table above is still a model: queue volumes, energization lags, carbon and
+              headroom are not operator data. The live print at the top is. MISO is read from
+              the public API. PJM and ERCOT appear there only after their keys are set.
             </p>
           </footer>
         </div>

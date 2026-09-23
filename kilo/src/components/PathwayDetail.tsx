@@ -12,6 +12,7 @@ import {
   StatusMarkIcon,
   WorkflowRail,
 } from "./ui";
+import { LocalWholesaleRow } from "./LiveTape";
 import { getPathway, qLabel } from "../data/pathways";
 import { geographyById } from "../lib/geo";
 import type { SearchCriteria } from "../lib/search";
@@ -105,6 +106,7 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
                     ${p.allInLow}–{p.allInHigh}/MWh
                   </span>
                 </div>
+                <LocalWholesaleRow market={p.market} />
                 <div className="dside-row">
                   <span className="mlabel">Est. capex</span>
                   <span className="dside-val num">${capexTotal}M</span>

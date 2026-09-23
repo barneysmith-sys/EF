@@ -9,6 +9,7 @@ import RequestsView from "./components/RequestsView";
 import { Wordmark } from "./components/ui";
 import { DEFAULT_CRITERIA, defaultFilters, type Filters, type SearchCriteria } from "./lib/search";
 import { PORTFOLIO_TOTAL_MW, PROJECTS, REQUESTS } from "./data/portfolio";
+import { useLiveBoard } from "./components/LiveTape";
 
 export type Route =
   | { name: "landing" }
@@ -32,6 +33,7 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(() => defaultFilters(DEFAULT_CRITERIA));
   const [searching, setSearching] = useState(false);
   const [clock, setClock] = useState(() => new Date());
+  const { board: live } = useLiveBoard();
 
   useEffect(() => {
     const t = setInterval(() => setClock(new Date()), 1000);
@@ -98,9 +100,15 @@ export default function App() {
         <div className="topbar-spacer" />
 
         <div className="topbar-right">
-          <div className="topbar-meta">
-            <span className="live-dot" />
-            <span>MARKET DATA LIVE</span>
+          <div className="topbar-meta" title={live?.miso?.asOf ?? "MISO public API"}>
+            <span className={`live-dot${live?.miso ? "" : " idle"}`} />
+            <span>
+              {live?.miso
+                ? `MISO $${live.miso.marginalEnergy.toFixed(2)}`
+                : live
+                  ? "MISO OFFLINE"
+                  : "READING MISO"}
+            </span>
           </div>
           <span className="topbar-sep" />
           <div className="topbar-meta">

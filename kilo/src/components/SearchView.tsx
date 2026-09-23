@@ -3,6 +3,7 @@ import UsMap from "./UsMap";
 import FilterRail from "./FilterRail";
 import ResultCard from "./ResultCard";
 import { Segmented } from "./ui";
+import { LiveReference } from "./LiveTape";
 import { geographyById, type Geography } from "../lib/geo";
 import { qLabel } from "../data/pathways";
 import {
@@ -103,6 +104,8 @@ export default function SearchView({
         </div>
         <span className="demo-chip">Demo data</span>
       </div>
+
+      <LiveReference />
 
       <div className="searchbody">
         <FilterRail
