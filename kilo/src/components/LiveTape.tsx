@@ -168,7 +168,7 @@ export default function LiveTape() {
             body={
               board?.eiaStatus === "ok"
                 ? `Hourly demand is in for ${board.eia?.map((r) => r.name).join(", ")}.`
-                : "Free key. Unlocks hourly demand for PJM, ERCOT, NYISO, ISO-NE and MISO. Register at eia.gov/opendata and set VITE_EIA_API_KEY."
+                : "Hourly demand for PJM and the other regions. The key stays in .env.local on the dev server, not in the site."
             }
           />
           <FeedRow
@@ -177,8 +177,8 @@ export default function LiveTape() {
             title="PJM Data Miner."
             body={
               board?.pjm && board.pjmStatus === "ok"
-                ? `${board.pjm.node} real-time LMP $${board.pjm.lmp.toFixed(2)}/MWh.`
-                : "Free non-member key. This is the real-time price for the Pennsylvania, Ohio and Virginia pathways. Set VITE_PJM_SUBSCRIPTION_KEY."
+                ? `${board.pjm.node} wholesale energy $${board.pjm.lmp.toFixed(2)}/MWh. Not a retail rate.`
+                : "PJM-RTO hourly LMP. The subscription key stays on the dev server. This is not the price a data center pays."
             }
           />
         </ul>

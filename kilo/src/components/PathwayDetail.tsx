@@ -13,6 +13,7 @@ import {
   WorkflowRail,
 } from "./ui";
 import { LocalWholesaleRow } from "./LiveTape";
+import RegionalEvidence from "./RegionalEvidence";
 import ProjectWorkspace from "./ProjectWorkspace";
 import { getDiscovery } from "../data/discovery";
 import { getPathway, qLabel } from "../data/pathways";
@@ -143,6 +144,8 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
               </div>
             </aside>
           </header>
+
+          {p.market.includes("PJM") && <RegionalEvidence virginia={p.state === "Virginia"} />}
 
           {discovery?.workspace && (
             <ProjectWorkspace

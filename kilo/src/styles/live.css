@@ -233,3 +233,47 @@
   line-height: 1.4;
   max-width: 28em;
 }
+
+.region {
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.detail .region {
+  margin: 8px 0 18px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+.region-head p,
+.region article p {
+  margin: 4px 0 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.region-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.region article {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+}
+.region-open ul {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+}
+.region-val {
+  margin-top: 4px;
+  font-size: 20px;
+}
+.region-val span {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.region-caveat {
+  color: var(--text-secondary);
+}

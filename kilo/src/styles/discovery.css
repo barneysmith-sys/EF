@@ -221,6 +221,28 @@
 .cert-requires-verification {
   color: var(--text-tertiary);
 }
+.deal {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+.deal button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--bg-raised);
+}
+.deal button.active {
+  border-color: var(--signal);
+  color: var(--text-primary);
+}
 .ws-facts {
   display: grid;
   grid-template-columns: 1fr 1fr;

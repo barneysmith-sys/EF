@@ -2,6 +2,12 @@ import { useState } from "react";
 import type { Actor, PathStep, VirginiaWorkspace } from "../data/discovery";
 import type { Pathway } from "../data/types";
 
+const DEAL = [
+  { id: "customer", kicker: "Customer", question: "Who needs 100 MW, and who can sign for it?" },
+  { id: "utility", kicker: "Utility", question: "What would Dominion have to study, and who pays?" },
+  { id: "infra", kicker: "Developer", question: "What has to be built, and who would build it?" },
+];
+
 export default function ProjectWorkspace({
   pathway,
   workspace,
@@ -13,7 +19,7 @@ export default function ProjectWorkspace({
   requestedMw: number;
   requiredBy: string;
 }) {
-  const [actorId, setActorId] = useState(workspace.actors[0]?.id ?? "");
+  const [actorId, setActorId] = useState("customer");
   const [stepId, setStepId] = useState(workspace.path[0]?.id ?? "");
   const actor = workspace.actors.find((item) => item.id === actorId) ?? workspace.actors[0];
   const step = workspace.path.find((item) => item.id === stepId) ?? workspace.path[0];
@@ -22,7 +28,7 @@ export default function ProjectWorkspace({
     <div className="workspace">
       <header className="ws-head">
         <div>
-          <div className="mlabel">Project workspace · mock</div>
+          <div className="mlabel">Deal room · mock</div>
           <h2 className="ws-name">{workspace.projectName}</h2>
           <p className="ws-lead">
             An illustration of a {requestedMw} MW data-center requirement in {pathway.state}, asked for{" "}
@@ -39,10 +45,22 @@ export default function ProjectWorkspace({
       </header>
 
       <section className="ws-block">
-        <div className="mlabel">Who has to act</div>
+        <div className="mlabel">Customer, utility, developer</div>
         <p className="ws-lead">
-          Select a party. Authority is split. Several of these roles may be the same company, or may not exist for this project.
+          Three parties have to be in the room before anyone can talk about energizing this load. The others may have a veto. Selecting one does not mean they are the customer for Kilo.
         </p>
+        <div className="deal">
+          {DEAL.map((item) => (
+            <button
+              key={item.id}
+              className={actorId === item.id ? "active" : ""}
+              onClick={() => setActorId(item.id)}
+            >
+              <span className="mlabel">{item.kicker}</span>
+              <span>{item.question}</span>
+            </button>
+          ))}
+        </div>
         <div className="actors">
           <div className="actor-nav">
             {workspace.actors.map((item) => (

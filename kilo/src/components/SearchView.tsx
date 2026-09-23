@@ -4,6 +4,7 @@ import FilterRail from "./FilterRail";
 import ResultCard from "./ResultCard";
 import { Segmented } from "./ui";
 import { LiveReference } from "./LiveTape";
+import RegionalEvidence from "./RegionalEvidence";
 import { PERSPECTIVES, useDiscovery } from "./DiscoveryContext";
 import { geographyById, type Geography } from "../lib/geo";
 import { qLabel } from "../data/pathways";
@@ -98,7 +99,7 @@ export default function SearchView({
           </span>
           <span className="topbar-sep" />
           <span>
-            <b className="num">{totalAvailable}</b> MW available
+            <b className="num">{totalAvailable}</b> MW modeled
           </span>
           <span className="topbar-sep" />
           <span>
@@ -109,6 +110,7 @@ export default function SearchView({
       </div>
 
       <LiveReference />
+      {[...results, ...nearby].some((row) => row.pathway.market.includes("PJM")) && <RegionalEvidence />}
 
       <div className="searchbody">
         <FilterRail

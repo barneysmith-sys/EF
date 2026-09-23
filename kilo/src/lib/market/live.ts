@@ -37,6 +37,19 @@ export interface EiaDemand {
   name: string;
   period: string;
   demandMw: number;
+  source: string;
+  coverage: string;
+  verification: "public";
+  caveat: string;
+}
+
+export interface VirginiaRetail {
+  period: string;
+  priceCentsPerKwh: number;
+  source: string;
+  coverage: string;
+  verification: "public";
+  caveat: string;
 }
 
 export interface PjmPrint {
@@ -44,6 +57,10 @@ export interface PjmPrint {
   node: string;
   lmp: number;
   energy: number;
+  source: string;
+  coverage: string;
+  verification: "public";
+  caveat: string;
 }
 
 export type FeedStatus = "off" | "ok" | "error";
@@ -53,31 +70,19 @@ export interface LiveBoard {
   miso: MisoPrint | null;
   misoError: string | null;
   eia: EiaDemand[] | null;
+  eiaRetrievedAt: string | null;
+  virginiaRetail: VirginiaRetail | null;
   eiaStatus: FeedStatus;
   eiaError: string | null;
   pjm: PjmPrint | null;
+  pjmRetrievedAt: string | null;
   pjmStatus: FeedStatus;
   pjmError: string | null;
 }
 
-const EIA_RESPONDENTS = ["PJM", "ERCO", "MISO", "NYIS", "ISNE"] as const;
-
-const EIA_NAMES: Record<string, string> = {
-  PJM: "PJM",
-  ERCO: "ERCOT",
-  MISO: "MISO",
-  NYIS: "NYISO",
-  ISNE: "ISO-NE",
-};
-
 function num(value: unknown): number {
   const n = Number(String(value ?? "").replace(/[$,\s]/g, ""));
   return Number.isFinite(n) ? n : NaN;
-}
-
-function envKey(name: "VITE_EIA_API_KEY" | "VITE_PJM_SUBSCRIPTION_KEY"): string {
-  const value = import.meta.env[name];
-  return typeof value === "string" ? value.trim() : "";
 }
 
 async function getJson(url: string, headers?: HeadersInit): Promise<unknown> {
@@ -138,64 +143,54 @@ async function fetchMiso(): Promise<MisoPrint> {
   };
 }
 
-async function fetchEia(): Promise<{ status: FeedStatus; rows: EiaDemand[] | null; error: string | null }> {
-  const key = envKey("VITE_EIA_API_KEY");
-  if (!key) return { status: "off", rows: null, error: null };
+const OFF_NOTE = "Keys stay on the dev server. The public site does not call EIA or PJM.";
 
-  const params = new URLSearchParams();
-  params.set("api_key", key);
-  params.set("frequency", "hourly");
-  params.append("data[]", "value");
-  params.append("facets[type][]", "D");
-  for (const id of EIA_RESPONDENTS) params.append("facets[respondent][]", id);
-  params.append("sort[0][column]", "period");
-  params.append("sort[0][direction]", "desc");
-  params.set("length", "40");
-
-  const json = (await getJson(
-    `https://api.eia.gov/v2/electricity/rto/region-data/data/?${params.toString()}`,
-  )) as { response?: { data?: Record<string, unknown>[] } };
-
-  const latest = new Map<string, EiaDemand>();
-  for (const row of json.response?.data ?? []) {
-    const respondent = String(row.respondent ?? "");
-    if (!respondent || latest.has(respondent)) continue;
-    const demandMw = num(row.value);
-    if (!Number.isFinite(demandMw)) continue;
-    latest.set(respondent, {
-      respondent,
-      name: EIA_NAMES[respondent] ?? String(row["respondent-name"] ?? respondent),
-      period: String(row.period ?? ""),
-      demandMw,
-    });
+async function fetchEia(): Promise<{
+  status: FeedStatus;
+  rows: EiaDemand[] | null;
+  retrievedAt: string | null;
+  virginiaRetail: VirginiaRetail | null;
+  error: string | null;
+}> {
+  if (!import.meta.env.DEV) {
+    return { status: "off", rows: null, retrievedAt: null, virginiaRetail: null, error: null };
   }
-  return { status: "ok", rows: [...latest.values()], error: null };
+  const json = (await getJson("/api/market/eia")) as {
+    status?: FeedStatus;
+    demand?: EiaDemand[] | null;
+    virginiaRetail?: VirginiaRetail | null;
+    retrievedAt?: string;
+    error?: string | null;
+  };
+  return {
+    status: json.status ?? "error",
+    rows: json.demand ?? null,
+    retrievedAt: json.retrievedAt ?? null,
+    virginiaRetail: json.virginiaRetail ?? null,
+    error: json.error ?? null,
+  };
 }
 
-async function fetchPjm(): Promise<{ status: FeedStatus; print: PjmPrint | null; error: string | null }> {
-  const key = envKey("VITE_PJM_SUBSCRIPTION_KEY");
-  if (!key) return { status: "off", print: null, error: null };
-
-  // pnode 1 is the PJM-RTO residual aggregate — the system price, not a bus.
-  const json = await getJson(
-    "https://api.pjm.com/api/v1/rt_hrl_lmps?rowCount=1&startRow=1&pnode_id=1",
-    { "Ocp-Apim-Subscription-Key": key },
-  );
-  const items = Array.isArray(json)
-    ? json
-    : ((json as { items?: unknown[] }).items ?? (json as { results?: unknown[] }).results ?? []);
-  const row = (items[0] ?? {}) as Record<string, unknown>;
-  const lmp = num(row.total_lmp_rt ?? row.total_lmp);
-  if (!Number.isFinite(lmp)) throw new Error("PJM did not return an LMP");
+async function fetchPjm(): Promise<{
+  status: FeedStatus;
+  print: PjmPrint | null;
+  retrievedAt: string | null;
+  error: string | null;
+}> {
+  if (!import.meta.env.DEV) {
+    return { status: "off", print: null, retrievedAt: null, error: null };
+  }
+  const json = (await getJson("/api/market/pjm")) as {
+    status?: FeedStatus;
+    print?: PjmPrint | null;
+    retrievedAt?: string;
+    error?: string | null;
+  };
   return {
-    status: "ok",
-    print: {
-      asOf: String(row.datetime_beginning_ept ?? row.datetime_beginning_utc ?? ""),
-      node: String(row.pnode_name ?? "PJM-RTO"),
-      lmp,
-      energy: num(row.system_energy_price_rt ?? row.system_energy_price),
-    },
-    error: null,
+    status: json.status ?? "error",
+    print: json.print ?? null,
+    retrievedAt: json.retrievedAt ?? null,
+    error: json.error ?? null,
   };
 }
 
@@ -205,20 +200,34 @@ export async function loadLiveBoard(): Promise<LiveBoard> {
   const eiaResult =
     eia.status === "fulfilled"
       ? eia.value
-      : { status: "error" as const, rows: null, error: eia.reason instanceof Error ? eia.reason.message : "EIA request failed" };
+      : {
+          status: "error" as const,
+          rows: null,
+          retrievedAt: null,
+          virginiaRetail: null,
+          error: eia.reason instanceof Error ? eia.reason.message : "EIA request failed",
+        };
   const pjmResult =
     pjm.status === "fulfilled"
       ? pjm.value
-      : { status: "error" as const, print: null, error: pjm.reason instanceof Error ? pjm.reason.message : "PJM request failed" };
+      : {
+          status: "error" as const,
+          print: null,
+          retrievedAt: null,
+          error: pjm.reason instanceof Error ? pjm.reason.message : "PJM request failed",
+        };
 
   return {
     fetchedAt: new Date().toISOString(),
     miso: miso.status === "fulfilled" ? miso.value : null,
     misoError: miso.status === "rejected" ? (miso.reason instanceof Error ? miso.reason.message : "MISO request failed") : null,
     eia: eiaResult.rows,
+    eiaRetrievedAt: eiaResult.retrievedAt,
+    virginiaRetail: eiaResult.virginiaRetail,
     eiaStatus: eiaResult.status,
     eiaError: eiaResult.error,
     pjm: pjmResult.print,
+    pjmRetrievedAt: pjmResult.retrievedAt,
     pjmStatus: pjmResult.status,
     pjmError: pjmResult.error,
   };
@@ -237,7 +246,7 @@ export function localWholesale(market: string, board: LiveBoard): LocalWholesale
       return {
         label: `${board.pjm.node} LMP`,
         value: `$${board.pjm.lmp.toFixed(2)}/MWh`,
-        note: "PJM real-time hourly. Energy only — not this pathway's all-in price.",
+        note: "PJM-RTO wholesale energy. Not a Dominion rate and not this pathway's delivered price.",
       };
     }
     const demand = board.eia?.find((r) => r.respondent === "PJM");
@@ -251,7 +260,9 @@ export function localWholesale(market: string, board: LiveBoard): LocalWholesale
     return {
       label: "PJM wholesale",
       value: "Not connected",
-      note: "A free EIA key adds hourly demand. A free PJM Data Miner key adds the real-time LMP.",
+        note: import.meta.env.DEV
+          ? "Put EIA_API_KEY and PJM_SUBSCRIPTION_KEY in .env.local. They stay on the dev server."
+          : OFF_NOTE,
     };
   }
 
