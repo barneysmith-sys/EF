@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import Landing from "./components/Landing";
 import SearchView from "./components/SearchView";
 import PathwayDetail from "./components/PathwayDetail";
@@ -10,6 +10,8 @@ import { Wordmark } from "./components/ui";
 import { DEFAULT_CRITERIA, defaultFilters, type Filters, type SearchCriteria } from "./lib/search";
 import { PORTFOLIO_TOTAL_MW, PROJECTS, REQUESTS } from "./data/portfolio";
 import { useLiveBoard } from "./components/LiveTape";
+import { DiscoveryProvider, PERSPECTIVES, useDiscovery } from "./components/DiscoveryContext";
+import ResearchPanel from "./components/ResearchPanel";
 
 export type Route =
   | { name: "landing" }
@@ -54,11 +56,6 @@ export default function App() {
     }, 1150);
   }, [criteria]);
 
-  const navTo = (name: Route["name"]) => {
-    if (name === "search") setRoute({ name: "search" });
-    else setRoute({ name } as Route);
-  };
-
   if (route.name === "landing") {
     return (
       <Landing
@@ -69,6 +66,47 @@ export default function App() {
       />
     );
   }
+
+  return (
+    <DiscoveryProvider>
+      <AppChrome
+        route={route}
+        setRoute={setRoute}
+        criteria={criteria}
+        filters={filters}
+        setFilters={setFilters}
+        clock={clock}
+        live={live}
+      />
+    </DiscoveryProvider>
+  );
+}
+
+function AppChrome({
+  route,
+  setRoute,
+  criteria,
+  filters,
+  setFilters,
+  clock,
+  live,
+}: {
+  route: Route;
+  setRoute: (route: Route) => void;
+  criteria: SearchCriteria;
+  filters: Filters;
+  setFilters: Dispatch<SetStateAction<Filters>>;
+  clock: Date;
+  live: ReturnType<typeof useLiveBoard>["board"];
+}) {
+  const { perspective, setPerspective, research, setResearch } = useDiscovery();
+  const screen =
+    route.name === "pathway" || route.name === "request" || route.name === "market" ? route.name : "search";
+
+  const navTo = (name: Route["name"]) => {
+    if (name === "search") setRoute({ name: "search" });
+    else setRoute({ name } as Route);
+  };
 
   return (
     <div className="app">
@@ -100,6 +138,23 @@ export default function App() {
         <div className="topbar-spacer" />
 
         <div className="topbar-right">
+          <div className="persp" role="group" aria-label="Demo perspective">
+            {PERSPECTIVES.map((p) => (
+              <button
+                key={p.id}
+                className={perspective === p.id ? "active" : ""}
+                onClick={() => setPerspective(p.id)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <button
+            className={`research-toggle${research ? " on" : ""}`}
+            onClick={() => setResearch(!research)}
+          >
+            Research
+          </button>
           <div className="topbar-meta" title={live?.miso?.asOf ?? "MISO public API"}>
             <span className={`live-dot${live?.miso ? "" : " idle"}`} />
             <span>
@@ -171,6 +226,7 @@ export default function App() {
           />
         )}
       </div>
+      <ResearchPanel screen={screen} />
     </div>
   );
 }

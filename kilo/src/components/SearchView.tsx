@@ -4,6 +4,7 @@ import FilterRail from "./FilterRail";
 import ResultCard from "./ResultCard";
 import { Segmented } from "./ui";
 import { LiveReference } from "./LiveTape";
+import { PERSPECTIVES, useDiscovery } from "./DiscoveryContext";
 import { geographyById, type Geography } from "../lib/geo";
 import { qLabel } from "../data/pathways";
 import {
@@ -34,6 +35,8 @@ export default function SearchView({
   onEditSearch,
 }: Props) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const { perspective } = useDiscovery();
+  const view = PERSPECTIVES.find((p) => p.id === perspective) ?? PERSPECTIVES[0];
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("fit");
   const listRef = useRef<HTMLDivElement>(null);
@@ -141,6 +144,9 @@ export default function SearchView({
                   </span>
                 )}
               </div>
+              <p className="results-question">
+                {view.label} view — {view.question}
+              </p>
             </div>
             <Segmented size="sm" options={SORT_OPTIONS} value={sort} onChange={setSort} />
           </div>

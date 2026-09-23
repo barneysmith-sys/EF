@@ -1,5 +1,7 @@
 import { ConfidenceMeter, MixBar, StatusMarkIcon } from "./ui";
 import type { ScoredPathway } from "../lib/search";
+import { getDiscovery } from "../data/discovery";
+import { PERSPECTIVES, useDiscovery } from "./DiscoveryContext";
 
 interface Props {
   scored: ScoredPathway;
@@ -11,6 +13,15 @@ interface Props {
 
 export default function ResultCard({ scored, selected, onHover, onSelect, onOpen }: Props) {
   const { pathway: p, rank, fit, meetsDate, meetsMw, quartersLate, mwShortfall } = scored;
+  const discovery = getDiscovery(p.id);
+  const { perspective } = useDiscovery();
+  const view = PERSPECTIVES.find((item) => item.id === perspective) ?? PERSPECTIVES[0];
+  const lead =
+    perspective === "utility"
+      ? discovery?.grid.find((f) => f.label.startsWith("Studies"))
+      : perspective === "developer"
+        ? discovery?.demand[0]
+        : discovery?.demand.find((f) => f.label === "Load");
 
   return (
     <article
@@ -101,6 +112,19 @@ export default function ResultCard({ scored, selected, onHover, onSelect, onOpen
         <span className="mlabel">Major constraint</span>
         <span className="rcard-constraint-text">{p.majorConstraint}</span>
       </div>
+
+      {discovery && (
+        <>
+          <div className="rcard-next">
+            <span className="mlabel">Next decision</span>
+            <span>{discovery.nextDecision}</span>
+          </div>
+          <div className="rcard-certs">
+            <span className="cert cert-estimated">Modeled, not available</span>
+            {lead && <span className={`cert cert-${lead.certainty.toLowerCase().replace(/\s+/g, "-")}`}>{view.label}: {lead.certainty}</span>}
+          </div>
+        </>
+      )}
 
       <footer className="rcard-foot">
         <span className="rcard-schedule num">{p.scheduleNote}</span>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, StatusMarkIcon, WorkflowRail } from "./ui";
-import { getPathway, qLabel } from "../data/pathways";
+import { getPathway, PATHWAYS, qLabel } from "../data/pathways";
+import { getDiscovery } from "../data/discovery";
 import { PROVIDER_RESPONSES, REQUEST_STEPS, VERIFICATION_CHECKS } from "../data/portfolio";
 import type { SearchCriteria } from "../lib/search";
 import type { ProviderResponse } from "../data/portfolio";
@@ -41,21 +42,20 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
 
   // Counterparties receive the request one by one — the request reads as going somewhere.
   useEffect(() => {
-    if (step !== 1 || sent >= COUNTERPARTIES.length) return;
+    if (step !== 3 || sent >= COUNTERPARTIES.length) return;
     const t = setTimeout(() => setSent((s) => s + 1), 95);
     return () => clearTimeout(t);
   }, [step, sent]);
 
   useEffect(() => {
-    if (step !== 1 || sent < COUNTERPARTIES.length || responsesIn >= PROVIDER_RESPONSES.length) return;
+    if (step !== 3 || sent < COUNTERPARTIES.length || responsesIn >= PROVIDER_RESPONSES.length) return;
     const t = setTimeout(() => setResponsesIn((r) => r + 1), 520);
     return () => clearTimeout(t);
   }, [step, sent, responsesIn]);
 
   if (!p) return <div className="empty">Pathway not found.</div>;
 
-  const firmMw = Math.round(p.deliverableMw * 0.667);
-  const flexMw = p.deliverableMw - firmMw;
+  const discovery = getDiscovery(p.id);
 
   return (
     <div className="reqflow">
@@ -63,12 +63,12 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
         <button className="backlink" onClick={onBack}>
           ← Pathway
         </button>
-        <div className="subbar-title">Power Request #1842</div>
+        <div className="subbar-title">Power Requirement #1842</div>
         <div className="subbar-sub">
           {p.deliverableMw} MW · {p.state} · {p.energization}
         </div>
         <div className="subbar-spacer" />
-        <WorkflowRail active={step >= 3 ? "Secure" : "Request"} compact />
+        <WorkflowRail active={step >= 5 ? "Secure" : "Request"} compact />
         <span className="topbar-sep" />
         <span className="demo-chip">Demo data</span>
       </div>
@@ -81,7 +81,7 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
               <div className="reqdoc">
                 <div className="reqdoc-watermark">DEMO DATA</div>
                 <header className="reqdoc-head">
-                  <div className="reqdoc-brand mono">KILO POWER REQUEST</div>
+                  <div className="reqdoc-brand mono">KILO POWER REQUIREMENT</div>
                   <div className="reqdoc-number num">#1842</div>
                 </header>
 
@@ -95,20 +95,36 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
 
                 <dl className="reqdoc-terms">
                   <Term label="Required by" value={p.energization} />
-                  <Term label="Term" value="15-year requirement" />
-                  <Term label="Firm load" value={`${firmMw} MW`} />
-                  <Term label="Flexible load" value={`${flexMw} MW`} />
-                  <Term label="Reliability" value="Mission critical" />
-                  <Term label="Ramp" value="6 quarters to full load" />
-                  <Term label="Interconnection" value={`${p.transmissionVoltage}, ${p.market}`} />
-                  <Term label="Counterparty" value="Investment grade" />
+                  <Term label="Term" value={discovery?.term ?? "15-year expected requirement"} />
+                  <Term label="Firm" value={discovery?.firmMw ?? "Unknown"} />
+                  <Term label="Flexible" value={discovery?.flexMw ?? "Unknown"} />
+                  <Term label="Site control" value={discovery?.siteControl ?? "Unknown"} />
+                  <Term label="Customer credit" value={discovery?.credit ?? "Unknown"} />
+                  <Term label="Utility engagement" value={discovery?.utilityEngagement ?? "Unknown"} />
+                  <Term label="Market" value={p.market} />
                 </dl>
+                {discovery && (
+                  <div className="req-ramp">
+                    {discovery.ramp.map((stepRamp) => (
+                      <div key={stepRamp.when}>
+                        <div className="mlabel">{stepRamp.when}</div>
+                        <div className="num">{stepRamp.mw}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="reqdoc-foot">
                   <div className="reqdoc-status">
                     <span className={`reqdoc-dot ${executed ? "ok" : "open"}`} />
                     <span>
-                      {executed ? "Capacity secured" : step >= 2 ? "Evaluating responses" : step >= 1 ? "Open to market" : "Draft"}
+                      {executed
+                        ? "Structure recorded"
+                        : step >= 4
+                          ? "Comparing structures"
+                          : step >= 3
+                            ? "Engaging parties"
+                            : "Draft requirement"}
                     </span>
                   </div>
                   <div className="reqdoc-meta mono">
@@ -118,9 +134,9 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
               </div>
 
               <div className="reqdoc-note">
-                A Power Request is the standardized unit Kilo puts into the market. One document, one
-                normalized set of terms, so proposals from a regulated utility, a generator and a
-                developer can be compared on the same basis.
+                A power requirement is a description of a load, not an offer to buy electricity. Firm
+                and flexible splits, the ramp, and credit are labeled from the mock project. Unknown
+                means nobody in this demo has established it.
               </div>
             </aside>
 
@@ -150,6 +166,12 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
                     {i === step && (
                       <div className="reqstep-body">
                         {i === 0 && (
+                          <CreateStep
+                            ramp={discovery?.ramp ?? []}
+                            onNext={() => setStep(1)}
+                          />
+                        )}
+                        {i === 1 && (
                           <VerifyStep
                             verifying={verifying}
                             verified={verified}
@@ -160,24 +182,25 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
                                 setVerified(true);
                               }, 1200);
                             }}
-                            onNext={() => setStep(1)}
-                          />
-                        )}
-                        {i === 1 && (
-                          <RequestStep
-                            sent={sent}
-                            responsesIn={responsesIn}
                             onNext={() => setStep(2)}
                           />
                         )}
-                        {i === 2 && (
+                        {i === 2 && <IdentifyStep currentId={p.id} onNext={() => setStep(3)} />}
+                        {i === 3 && (
+                          <RequestStep
+                            sent={sent}
+                            responsesIn={responsesIn}
+                            onNext={() => setStep(4)}
+                          />
+                        )}
+                        {i === 4 && (
                           <CompareStep
                             awardedId={awardedId}
                             onAward={setAwardedId}
-                            onNext={() => setStep(3)}
+                            onNext={() => setStep(5)}
                           />
                         )}
-                        {i === 3 && (
+                        {i === 5 && (
                           <SecureStep
                             response={PROVIDER_RESPONSES.find((r) => r.id === awardedId) ?? PROVIDER_RESPONSES[0]}
                             executed={executed}
@@ -203,6 +226,58 @@ export default function RequestFlow({ pathwayId, criteria, onBack, onDone }: Pro
             </p>
           </footer>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CreateStep({ ramp, onNext }: { ramp: { when: string; mw: string }[]; onNext: () => void }) {
+  return (
+    <div className="stepbody">
+      <p className="stepintro">
+        The requirement records what the customer says they need. It does not mean a utility has
+        accepted it, or that any megawatt on this page can be delivered.
+      </p>
+      <div className="req-ramp">
+        {ramp.map((r) => (
+          <div key={r.when}>
+            <div className="mlabel">{r.when}</div>
+            <div className="num">{r.mw}</div>
+          </div>
+        ))}
+      </div>
+      <div className="stepfoot">
+        <div className="stepfoot-note">Mock ramp. Not a customer load letter.</div>
+        <Button variant="primary" onClick={onNext}>
+          Verify project →
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function IdentifyStep({ currentId, onNext }: { currentId: string; onNext: () => void }) {
+  return (
+    <div className="stepbody">
+      <p className="stepintro">
+        These are modeled routes from the requirement toward energization. Opening one does not
+        reserve capacity.
+      </p>
+      <div className="path-list">
+        {PATHWAYS.map((item) => (
+          <div key={item.id} className={`path-row${item.id === currentId ? " current" : ""}`}>
+            <span>{item.state}</span>
+            <span className="num">{item.deliverableMw} MW</span>
+            <span className="num">{item.energization}</span>
+            <span>{item.utility}</span>
+          </div>
+        ))}
+      </div>
+      <div className="stepfoot">
+        <div className="stepfoot-note">The highlighted row is the pathway this requirement was opened from.</div>
+        <Button variant="primary" onClick={onNext}>
+          Engage parties →
+        </Button>
       </div>
     </div>
   );
@@ -234,9 +309,8 @@ function VerifyStep({
   return (
     <div className="stepbody">
       <p className="stepintro">
-        Before a requirement goes to market, Kilo verifies that it is real and financeable. Anything
-        unresolved is disclosed to counterparties rather than hidden — an unverified request gets
-        priced for uncertainty.
+        Verification here only marks which demo checks are filled in. A check marked clear is still
+        mock evidence. Open items stay visible.
       </p>
 
       <div className="vchecks">
@@ -255,12 +329,11 @@ function VerifyStep({
         <div className="stepfoot-note">
           <span className="num">{VERIFICATION_CHECKS.length - open}</span> of{" "}
           <span className="num">{VERIFICATION_CHECKS.length}</span> checks clear.{" "}
-          <span className="warn-text">{open} disclosed as open</span> — these will be published with
-          the request.
+          <span className="warn-text">{open} disclosed as open</span>. Open items stay on the requirement.
         </div>
         {verified ? (
           <Button variant="primary" onClick={onNext}>
-            Publish to market →
+            Identify pathways →
           </Button>
         ) : (
           <Button variant="primary" onClick={onVerify} disabled={verifying}>
@@ -293,9 +366,8 @@ function RequestStep({
   return (
     <div className="stepbody">
       <p className="stepintro">
-        The request goes to qualified counterparties in and around the target market — regulated
-        utilities, generators, independent power producers and developers. Each receives the same
-        standardized document.
+        Engaging a party means sending the requirement, not buying power. The names below are
+        fictional. A response in this demo is not a study, a tariff, or a contract.
       </p>
 
       <div className="sendgrid">
@@ -346,7 +418,7 @@ function RequestStep({
             : "Awaiting responses. In a live market this window would run 10–20 business days."}
         </div>
         <Button variant="primary" onClick={onNext} disabled={responsesIn < PROVIDER_RESPONSES.length}>
-          Compare pathways →
+          Compare structures →
         </Button>
       </div>
     </div>

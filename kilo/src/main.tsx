@@ -12,6 +12,7 @@ import "./styles/detail.css";
 import "./styles/request.css";
 import "./styles/pages.css";
 import "./styles/live.css";
+import "./styles/discovery.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

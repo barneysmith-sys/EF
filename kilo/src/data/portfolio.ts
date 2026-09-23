@@ -451,24 +451,34 @@ export const REQUESTS: PowerRequest[] = [
 
 export const REQUEST_STEPS = [
   {
-    key: "verify",
-    label: "Verify project",
-    caption: "Confirm load, site control, credit and the technical envelope before anything goes to market.",
+    key: "create",
+    label: "Create power requirement",
+    caption: "Write down the load, the date, the ramp, and what is already known.",
   },
   {
-    key: "request",
-    label: "Request proposals",
-    caption: "Publish a standardized requirement to qualified utilities, generators and developers.",
+    key: "verify",
+    label: "Verify project",
+    caption: "Separate what is evidenced from what is still a claim.",
+  },
+  {
+    key: "identify",
+    label: "Identify pathways",
+    caption: "Lay out possible routes to energization. None of them is available capacity.",
+  },
+  {
+    key: "engage",
+    label: "Engage parties",
+    caption: "Put the same requirement in front of the utility, developers and capital. This is not a purchase.",
   },
   {
     key: "compare",
-    label: "Compare pathways",
-    caption: "Normalize responses to a common basis — delivered cost, date, firmness and carbon.",
+    label: "Compare structures",
+    caption: "Compare who would build, who would sign, and what is still unknown.",
   },
   {
     key: "secure",
     label: "Secure capacity",
-    caption: "Award, execute, post collateral and convert the pathway into a contracted position.",
+    caption: "Only after a structure exists does anyone talk about a contract.",
   },
 ] as const;
 

@@ -13,6 +13,8 @@ import {
   WorkflowRail,
 } from "./ui";
 import { LocalWholesaleRow } from "./LiveTape";
+import ProjectWorkspace from "./ProjectWorkspace";
+import { getDiscovery } from "../data/discovery";
 import { getPathway, qLabel } from "../data/pathways";
 import { geographyById } from "../lib/geo";
 import type { SearchCriteria } from "../lib/search";
@@ -27,6 +29,7 @@ interface Props {
 
 export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity }: Props) {
   const p = getPathway(id);
+  const discovery = p ? getDiscovery(p.id) : undefined;
   const [openSection, setOpenSection] = useState<string | null>(p?.sections[0]?.key ?? null);
 
   const capexTotal = useMemo(() => {
@@ -52,7 +55,7 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
         <span className="topbar-sep" />
         <span className="demo-chip">Demo data</span>
         <Button variant="primary" size="sm" onClick={onRequestCapacity}>
-          Request Capacity →
+          Create power requirement →
         </Button>
       </div>
 
@@ -132,15 +135,16 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
                   <MixBar grid={p.mix.grid} generation={p.mix.generation} storage={p.mix.storage} showLegend height={7} />
                 </div>
                 <Button variant="primary" full onClick={onRequestCapacity}>
-                  Request Capacity
+                  Create power requirement
                 </Button>
                 <div className="dside-cta-note">
-                  Converts this pathway into a standardized Power Request and puts it in front of
-                  utilities, generators and developers.
+                  Opens a requirement for this modeled pathway. It does not reserve or buy electricity.
                 </div>
               </div>
             </aside>
           </header>
+
+          {discovery && <ProjectWorkspace pathway={p} discovery={discovery} />}
 
           {/* ───────── Status checklist ───────── */}
           <section className="dchecklist">
@@ -373,13 +377,13 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
 
                 <div className="dcta panel">
                   <div className="mlabel">Next step</div>
-                  <h4 className="dcta-title">Request Capacity</h4>
+                  <h4 className="dcta-title">Create a power requirement</h4>
                   <p className="dcta-body">
-                    Publish a standardized Power Request for {p.deliverableMw} MW in {p.state} by{" "}
-                    {p.energization} and collect normalized proposals.
+                    Write a requirement for {p.deliverableMw} MW in {p.state} by {p.energization}, then
+                    see who would have to act. This does not reserve capacity.
                   </p>
                   <Button variant="primary" full onClick={onRequestCapacity}>
-                    Request Capacity →
+                    Create power requirement →
                   </Button>
                 </div>
               </div>

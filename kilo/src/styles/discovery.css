@@ -1,0 +1,345 @@
+.persp {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+.persp button {
+  height: 100%;
+  padding: 0 9px;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.persp button.active {
+  color: var(--text-primary);
+  background: var(--bg-active);
+}
+.research-toggle {
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.research-toggle.on {
+  color: var(--signal);
+  border-color: var(--signal);
+}
+
+.results-question {
+  margin-top: 6px;
+  max-width: 420px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.rcard-next {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.rcard-next .mlabel {
+  flex: none;
+}
+.rcard-certs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.workspace {
+  margin: 28px 0 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.ws-head,
+.ws-block-head,
+.party p,
+.ws-lead,
+.research p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.ws-head {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 28px;
+  margin-bottom: 22px;
+}
+.ws-name {
+  margin: 4px 0;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 34px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+}
+.ws-meta {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+.ws-view {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+.ws-cares {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+}
+.ws-block {
+  margin: 22px 0;
+}
+.ws-block.emphasis,
+.party.emphasis {
+  outline: 1px solid var(--signal);
+  outline-offset: 8px;
+}
+.life {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.life-stage {
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+.life-idx,
+.dmap-idx {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+.life-label {
+  margin: 2px 0 8px;
+  font-size: 13px;
+  font-weight: 560;
+}
+.ws-row {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 12px;
+}
+.ws-row dt {
+  color: var(--text-tertiary);
+}
+.ws-row dd.unknown,
+.unknown {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+.ready {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ready-item,
+.party,
+.actor-card,
+.seat {
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+.ready-item {
+  padding: 10px 12px;
+}
+.ready-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+}
+.ready-state {
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.ready-ev {
+  margin-top: 4px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+.ws-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.party {
+  padding: 12px;
+}
+.party ul {
+  margin-top: 10px;
+}
+.party li {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.party-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.party-value {
+  margin: 2px 0 4px;
+  font-size: 12.5px;
+}
+.cert {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.cert-known {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+}
+.cert-estimated {
+  color: var(--signal);
+  border-color: color-mix(in srgb, var(--signal) 45%, transparent);
+}
+.cert-unknown,
+.cert-requires-verification {
+  color: var(--text-tertiary);
+}
+.actors {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.actor-nav {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+}
+.actor-nav button {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--line);
+}
+.actor-nav button.active {
+  color: var(--text-primary);
+  background: var(--bg-active);
+}
+.actor-card {
+  padding: 12px 14px;
+}
+.seats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.seat {
+  padding: 10px;
+  font-size: 12.5px;
+}
+.dmap {
+  margin-top: 10px;
+}
+.dmap li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.dmap-title {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.dmap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.req-ramp {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.req-ramp div {
+  padding: 8px;
+  border: 1px solid var(--line);
+}
+.req-ramp .num {
+  font-size: 16px;
+}
+.path-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.path-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr 0.8fr 0.7fr;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+}
+.path-row.current {
+  border-color: var(--signal);
+}
+
+.research {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.research-bar {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 18px;
+  text-align: left;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.research-body {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.2fr 1.2fr 160px;
+  gap: 14px;
+  padding: 0 18px 14px;
+}
+.research-body textarea,
+.research-body select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px;
+}
+.research-body textarea {
+  min-height: 72px;
+  resize: vertical;
+}
