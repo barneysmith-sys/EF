@@ -1,7 +1,6 @@
-import type { StatusMark } from "./types";
+/** Mock discovery notes. Nothing here is deliverable capacity. */
 
-/** How sure the prototype is. Unknown is a valid and useful answer. */
-export type Certainty = "Known" | "Estimated" | "Unknown" | "Requires verification";
+export type Certainty = "Known" | "Estimated" | "Unverified" | "Unknown";
 
 export interface Fact {
   label: string;
@@ -9,26 +8,15 @@ export interface Fact {
   certainty: Certainty;
 }
 
-export interface LifecycleStage {
-  label: string;
-  owner: string;
-  decisionMaker: string;
-  evidence: string;
-  capitalAtRisk: string;
-  status: string;
-  blocker: string;
-  next: string;
-}
-
 export interface Actor {
+  id: string;
   role: string;
-  wants: string;
+  incentive: string;
   controls: string;
-  doesNot: string;
-  risk: string;
-  pays: string;
-  decision: string;
-  status: string;
+  needsOthers: string;
+  money: string;
+  outstanding: string;
+  next: string;
 }
 
 export interface Seat {
@@ -36,33 +24,21 @@ export interface Seat {
   who: string;
 }
 
-export interface DecisionNode {
-  decision: string;
-  actor: string;
+export interface PathStep {
+  id: string;
+  title: string;
+  responsible: string;
   depends: string;
-  money: string;
   evidence: string;
-  time: string;
-  status: StatusMark | "unknown";
-}
-
-export interface ReadinessItem {
-  label: string;
-  state: string;
-  evidence: string;
+  blocker: string;
+  note: string;
 }
 
 export interface Discovery {
-  projectName: string;
   nextDecision: string;
   demand: Fact[];
   grid: Fact[];
   supply: Fact[];
-  lifecycle: LifecycleStage[];
-  actors: Actor[];
-  seats: Seat[];
-  decisions: DecisionNode[];
-  readiness: ReadinessItem[];
   ramp: { when: string; mw: string }[];
   firmMw: string;
   flexMw: string;
@@ -70,299 +46,257 @@ export interface Discovery {
   siteControl: string;
   credit: string;
   utilityEngagement: string;
+  workspace?: VirginiaWorkspace;
 }
 
-const UNKNOWN = "Unknown";
-
-function seats(partial: Partial<Record<Seat["seat"], string>>): Seat[] {
-  const names = [
-    "Day-to-day problem owner",
-    "Internal champion",
-    "Economic buyer",
-    "Technical decision maker",
-    "Budget owner",
-    "Contract signer",
-    "Grid authority",
-  ];
-  return names.map((seat) => ({ seat, who: partial[seat] ?? UNKNOWN }));
+export interface VirginiaWorkspace {
+  projectName: string;
+  actors: Actor[];
+  seats: Seat[];
+  path: PathStep[];
 }
 
-const PA: Discovery = {
-  projectName: "Project Atlas",
-  nextDecision: "Whether PPL will open a load study before a transformer slot is reserved",
+const UNKNOWN = "UNKNOWN";
+
+const SEATS: Seat[] = [
+  { seat: "Day-to-day problem owner", who: UNKNOWN },
+  { seat: "Internal champion", who: UNKNOWN },
+  { seat: "Economic buyer", who: UNKNOWN },
+  { seat: "Budget owner", who: UNKNOWN },
+  { seat: "Contract signer", who: UNKNOWN },
+];
+
+const VIRGINIA: Discovery = {
+  nextDecision: "Who would apply to Dominion, and which process that application would enter",
   demand: [
-    { label: "Who needs the power", value: "Unnamed data-center developer, represented in this demo as Project Atlas", certainty: "Requires verification" },
-    { label: "Load", value: "120 MW requested · 120 MW modeled as deliverable", certainty: "Estimated" },
-    { label: "Site control", value: "310 acres described as under option through Q3 2027", certainty: "Requires verification" },
+    { label: "Who needs the power", value: "Illustrative data-center developer. No company is named.", certainty: "Unverified" },
+    { label: "Requirement", value: "100 MW stated. Not a measured load.", certainty: "Unverified" },
+    { label: "Site control", value: UNKNOWN, certainty: "Unknown" },
     { label: "Financing", value: UNKNOWN, certainty: "Unknown" },
-    { label: "Load ramp", value: "Modeled, not a customer schedule", certainty: "Estimated" },
-    { label: "Firm vs flexible", value: "80 MW firm / 40 MW flexible — an assumption, not a signed profile", certainty: "Estimated" },
   ],
   grid: [
-    { label: "Utility", value: "PPL Electric Utilities", certainty: "Known" },
-    { label: "ISO/RTO", value: "PJM, PPL / MAAC zone", certainty: "Known" },
-    { label: "Studies", value: "Which study this load would actually enter is not confirmed", certainty: "Unknown" },
-    { label: "Upgrades", value: "Transformer lead time is the modeled constraint. Network upgrades are not", certainty: "Estimated" },
-    { label: "Authority to say yes", value: "Who at PPL or PJM can commit a date", certainty: "Unknown" },
+    { label: "Utility in the model", value: "Dominion Energy Virginia", certainty: "Unverified" },
+    { label: "ISO/RTO in the model", value: "PJM, DOM zone", certainty: "Unverified" },
+    { label: "Which process applies", value: "Retail service, a transmission request, or both", certainty: "Unknown" },
+    { label: "Studies", value: "None in this prototype", certainty: "Unknown" },
   ],
   supply: [
-    { label: "Existing generation", value: "30 MW modeled as an adjacent nuclear PPA. No contract is in hand", certainty: "Estimated" },
-    { label: "New generation", value: "Whether any new generation is required", certainty: "Unknown" },
-    { label: "Storage", value: "20 MW / 80 MWh modeled. No developer identified", certainty: "Estimated" },
-    { label: "Who builds it", value: UNKNOWN, certainty: "Unknown" },
-    { label: "Land and equipment", value: "Parcel and a 128-week transformer quote are modeled", certainty: "Requires verification" },
-  ],
-  lifecycle: [
-    { label: "Requirement", owner: "Customer", decisionMaker: UNKNOWN, evidence: "A written MW, date and ramp", capitalAtRisk: "Internal staff time", status: "Drafted in this demo", blocker: "No named customer", next: "Put a real load owner on the requirement" },
-    { label: "Site", owner: "Site developer", decisionMaker: UNKNOWN, evidence: "Option, title, zoning", capitalAtRisk: "Option payment — amount unknown", status: "Described as optioned", blocker: "Option not in the evidence set", next: "Confirm the option is real and assignable" },
-    { label: "Utility engagement", owner: "Customer, then utility", decisionMaker: "Unknown at PPL", evidence: "A utility meeting note or study request", capitalAtRisk: "Study deposits — unknown", status: "Not started", blocker: "No engagement on record", next: "Identify the PPL key-account owner" },
-    { label: "Power pathway", owner: UNKNOWN, decisionMaker: UNKNOWN, evidence: "A sourced mix of grid, generation and storage", capitalAtRisk: UNKNOWN, status: "Preliminary model", blocker: "Mix is not a commercial structure", next: "Separate what is grid service from what must be built" },
-    { label: "Studies", owner: "Utility / PJM", decisionMaker: "PJM and PPL — roles not separated yet", evidence: "Study scope and queue position", capitalAtRisk: "Study fees, unknown", status: "Pending", blocker: "Nothing filed", next: "Learn which process this load would enter" },
-    { label: "Commercial structure", owner: UNKNOWN, decisionMaker: UNKNOWN, evidence: "Term sheet: who sells, who buys, who builds", capitalAtRisk: UNKNOWN, status: "Unknown", blocker: "No structure chosen", next: "Ask who would sign, and for what" },
-    { label: "Infrastructure", owner: UNKNOWN, decisionMaker: UNKNOWN, evidence: "Equipment slot, construction party", capitalAtRisk: "Transformer deposit — not held", status: "Quoted, not committed", blocker: "128-week transformer, no slot", next: "Find who would pay to hold the slot" },
-    { label: "Contracted", owner: UNKNOWN, decisionMaker: UNKNOWN, evidence: "Executed agreements", capitalAtRisk: UNKNOWN, status: "Not started", blocker: "No counterparty", next: "Do not treat a model as a contract" },
-    { label: "Energized", owner: "Utility", decisionMaker: UNKNOWN, evidence: "Permission to energize", capitalAtRisk: "Full project — unknown", status: "Target Q2 2029, modeled", blocker: "Every prior stage", next: "Treat the date as a hypothesis" },
-  ],
-  actors: [
-    { role: "Power customer", wants: "120 MW energized on a date they can underwrite", controls: "The requirement, if they exist", doesNot: "Whether the grid can serve it", risk: "Site and schedule risk — unquantified", pays: UNKNOWN, decision: "Whether to keep this site", status: "Not named" },
-    { role: "Utility", wants: "A load that will actually show up and pay", controls: "Distribution and the local study, subject to tariff", doesNot: "PJM market outcomes", risk: "Stranded upgrades if the load slips", pays: "Study work, recovered or not — unknown", decision: "Whether to open a study", status: "Not engaged" },
-    { role: "ISO/RTO", wants: "A reliable system", controls: "Wholesale market rules and regional transmission planning", doesNot: "The retail relationship with the customer", risk: "System, not project, risk", pays: "Socialized where the tariff says so", decision: "Whether this load is a regional transmission problem", status: "Unknown" },
-    { role: "Power developer", wants: "A credible offtaker", controls: "Generation and storage they choose to build", doesNot: "The interconnection date", risk: "Development capital", pays: "Development spend", decision: "Whether this load is real enough to spend on", status: "No developer attached" },
-    { role: "Site developer", wants: "A tenant or a sale", controls: "The land, if the option is real", doesNot: "Power delivery", risk: "Land basis", pays: "Carry on the land", decision: "How long to hold the option", status: "Unverified" },
-    { role: "Generation owner", wants: "A long contract", controls: "Existing plant output", doesNot: "Delivery to this site", risk: "Merchant price if unsold", pays: "Plant operations", decision: "Whether to offer 30 MW", status: "Modeled, not offered" },
-    { role: "Storage developer", wants: "A flexibility buyer", controls: "The storage project", doesNot: "Whether the utility counts it", risk: "Equipment and interconnection", pays: "Storage capex", decision: "Whether 20 MW is even needed", status: "Unknown" },
-    { role: "Regulator", wants: "Rates and reliability", controls: "Tariff and siting approvals where they apply", doesNot: "Commercial terms between private parties", risk: "Political", pays: "Nothing directly", decision: "Whether an approval is required here", status: "Unknown" },
-    { role: "Investor / capital", wants: "A dated path to revenue", controls: "Whether capital is available", doesNot: "The energization date", risk: "Capital", pays: "The project, if they commit", decision: "What evidence is enough to fund", status: "Unknown" },
-    { role: "Other", wants: UNKNOWN, controls: UNKNOWN, doesNot: UNKNOWN, risk: UNKNOWN, pays: UNKNOWN, decision: "Who else has a veto", status: "Unknown" },
-  ],
-  seats: seats({
-    "Grid authority": "Split between PPL and PJM — boundary not mapped",
-  }),
-  decisions: [
-    { decision: "Is there a real customer?", actor: "Customer", depends: "Nothing", money: "None yet", evidence: "A named entity and a budget owner", time: "Unknown", status: "unknown" },
-    { decision: "Hold the land option?", actor: "Site developer", depends: "Customer credibility", money: "Option cost — unknown", evidence: "The option agreement", time: "Before Q3 2027, if the model is right", status: "warn" },
-    { decision: "Ask the utility for a study?", actor: "Customer or site developer", depends: "Someone willing to be the applicant", money: "Study deposit — unknown", evidence: "Utility application rules", time: "Unknown", status: "pending" },
-    { decision: "Reserve a transformer?", actor: UNKNOWN, depends: "Someone willing to fund a slot", money: "Deposit — not sized", evidence: "A quote and a cancellation right", time: "128 weeks quoted", status: "warn" },
-    { decision: "File at PJM?", actor: UNKNOWN, depends: "Study path", money: "Queue deposits", evidence: "Which cycle and which request type", time: "Unknown", status: "unknown" },
-    { decision: "Choose a commercial structure?", actor: UNKNOWN, depends: "Who is selling power versus building wires", money: "Changes who funds capex", evidence: "A term sheet", time: "Unknown", status: "unknown" },
-  ],
-  readiness: [
-    { label: "Site control", state: "Described, not verified", evidence: "Demo note of a 310-acre option. No document." },
-    { label: "Financing", state: "Unknown", evidence: "No evidence." },
-    { label: "Load requirement", state: "Stated", evidence: "120 MW entered in search. Not a customer load letter." },
-    { label: "Target date", state: "Stated", evidence: "Q2 2029 from the search. Not agreed with a utility." },
-    { label: "Utility engagement", state: "Not started", evidence: "No correspondence." },
-    { label: "Power pathway", state: "Preliminary", evidence: "A modeled 70 / 30 / 20 mix. Not a study." },
-    { label: "Interconnection / studies", state: "Pending", evidence: "Nothing filed." },
-    { label: "Commercial commitment", state: "Unknown", evidence: "No term sheet, no buyer, no seller." },
+    { label: "Dedicated generation", value: "The model sketches 35 MW. Nobody has agreed to build it.", certainty: "Estimated" },
+    { label: "Storage", value: "The model sketches 15 MW. Relevance is not established.", certainty: "Estimated" },
+    { label: "Who would build infrastructure", value: UNKNOWN, certainty: "Unknown" },
   ],
   ramp: [
-    { when: "2028", mw: "40 MW" },
-    { when: "2029", mw: "80 MW" },
-    { when: "2030", mw: "120 MW" },
+    { when: "2028", mw: "UNKNOWN" },
+    { when: "2029", mw: "UNKNOWN" },
+    { when: "2030", mw: "100 MW asked" },
   ],
-  firmMw: "80 MW",
-  flexMw: "40 MW",
-  term: "15-year expected requirement",
-  siteControl: "Described as optioned — not verified",
-  credit: "Unknown",
+  firmMw: "UNKNOWN",
+  flexMw: "UNKNOWN",
+  term: "UNKNOWN",
+  siteControl: "UNKNOWN",
+  credit: "UNKNOWN",
   utilityEngagement: "Not started",
+  workspace: {
+    projectName: "Virginia data-center requirement",
+    seats: SEATS,
+    actors: [
+      {
+        id: "customer",
+        role: "Power customer",
+        incentive: "Get about 100 MW energized on a date the project can underwrite. The company is illustrative. No customer has been interviewed.",
+        controls: "The requirement they are willing to state. Whether they keep a site. Their own spend.",
+        needsOthers: "Whether the utility will study the load. Whether PJM is involved. Permission to energize. Any infrastructure someone else must build.",
+        money: "Site and development spend. Amount UNKNOWN. Risk of committing to land before a service date exists.",
+        outstanding: "Legal name, site control, credit, ramp, firm versus flexible load, and who can sign.",
+        next: "Name the applicant who would actually contact Dominion.",
+      },
+      {
+        id: "utility",
+        role: "Utility — Dominion Energy Virginia",
+        incentive: "A hypothesis, not a finding: a load that arrives and pays, without upgrades that are stranded if the load slips.",
+        controls: "The retail relationship and the utility studies and construction in their tariff. The exact large-load process for this county is UNKNOWN.",
+        needsOthers: "A real applicant. PJM, where the delivery problem is regional. A regulator, where an approval is required. A builder, if new facilities are not the utility's to construct.",
+        money: "Study and upgrade costs. Who pays, and how much, is UNKNOWN. Risk sits with whoever funds work for a load that does not show up.",
+        outstanding: "Which tariff applies, whether a deposit is required, and who at Dominion would take the conversation.",
+        next: "Identify that person. Do not treat this model as a load study.",
+      },
+      {
+        id: "pjm",
+        role: "Grid process — PJM, DOM zone",
+        incentive: "Reliability of the regional system. This project's schedule is not PJM's objective.",
+        controls: "Regional transmission planning and the request types in PJM's rules. Whether this 100 MW load is a PJM matter or only a Dominion retail matter is UNKNOWN.",
+        needsOthers: "The transmission owner and an applicant have to file the right request. PJM does not sign the customer's retail contract.",
+        money: "Deposits, if a request is filed. Amount UNKNOWN. Who would post them is UNKNOWN.",
+        outstanding: "Request type, cycle, and whether the modeled 2030 substation is a real PJM project or only a sketch.",
+        next: "Learn which process would apply before describing a queue position.",
+      },
+      {
+        id: "infra",
+        role: "Infrastructure developer",
+        incentive: "Hypothesis: a fee or a project they can finance. No developer is attached to this requirement.",
+        controls: "Work they agree to take. They do not control the energization date.",
+        needsOthers: "The utility for interconnection. The customer, or another payer, for a reason to build. Landowners for right-of-way.",
+        money: "Development capital. Amount UNKNOWN. The model mentions a 500 kV-class transformer lead time. No slot is held, and no quote is in evidence.",
+        outstanding: "Whether a new substation or line is required, who would own it, and whether the 2030 date is anyone's schedule.",
+        next: "Separate the sketch from anything a party has agreed to build.",
+      },
+      {
+        id: "supply",
+        role: "Supply developer",
+        incentive: "Hypothesis: a contract for generation or storage. It is UNKNOWN whether this load needs either.",
+        controls: "A project they choose to develop. Not delivery of utility service to the site.",
+        needsOthers: "Interconnection, a buyer, and permits. The utility may be able to serve the load without a new plant. That has not been determined.",
+        money: "Development and equipment spend. Amount UNKNOWN. Building supply that is not required is the risk.",
+        outstanding: "Whether the 35 MW and 15 MW figures in the pathway model are a commercial need or only a sketch.",
+        next: "Do not staff a generation or storage project until some party shows it is required.",
+      },
+      {
+        id: "regulator",
+        role: "Regulator and permitting",
+        incentive: "Land use, rates, and reliability, depending on the office. Not confirmed.",
+        controls: "Approvals inside their jurisdiction. They do not set the private commercial terms.",
+        needsOthers: "An application from someone. Which office must act — county, state commission, or neither — is UNKNOWN.",
+        money: "They do not fund the project. Applicant cost is UNKNOWN.",
+        outstanding: "The model flags rezoning in Louisa County. Whether that is the binding approval, and whether a state certificate is required, is UNKNOWN.",
+        next: "List the approvals with someone who has permitted a load in this county.",
+      },
+      {
+        id: "capital",
+        role: "Capital provider",
+        incentive: "Hypothesis: a dated path to repayment. No investor is in this file.",
+        controls: "Whether to commit money. Not the date the utility will energize.",
+        needsOthers: "A structure, a counterparty, and evidence that both the load and the grid path are real.",
+        money: "Instrument and amount UNKNOWN. Who bears upgrade risk is UNKNOWN.",
+        outstanding: "Who the economic buyer is, what evidence they would require, and whether they would pay for coordination.",
+        next: "Ask what would be enough to fund, and who would be asked to pay.",
+      },
+    ],
+    path: [
+      {
+        id: "requirement",
+        title: "State the requirement",
+        responsible: "Power customer",
+        depends: "Nothing. This can start before any utility conversation.",
+        evidence: "A named entity, megawatts, a target date, a ramp, and what is firm versus flexible.",
+        blocker: "The 100 MW figure is an illustration. Firm, flexible, ramp, and term are UNKNOWN.",
+        note: "Stating a requirement does not create a right to service.",
+      },
+      {
+        id: "site",
+        title: "Hold a site",
+        responsible: "Customer or a site developer",
+        depends: "Can run beside the requirement. It does not, by itself, unlock power.",
+        evidence: "Option or title, and the zoning status.",
+        blocker: "Site control is UNKNOWN. The pathway model says the parcel would need rezoning. That document is not here.",
+        note: "In another structure the customer never controls the land. This step is not universal.",
+      },
+      {
+        id: "utility",
+        title: "Open the utility process",
+        responsible: "Customer, then Dominion",
+        depends: "Someone willing to be the applicant.",
+        evidence: "Dominion's actual large-load or line-extension process for this location, including any deposit.",
+        blocker: "That process, and the person who owns it, are UNKNOWN. Engagement has not started.",
+        note: "Other utilities do not use Dominion's process. This is not a template for every territory.",
+      },
+      {
+        id: "grid",
+        title: "Decide which grid process applies",
+        responsible: "Dominion, PJM, or both — unresolved",
+        depends: "The utility conversation. The two processes are not a single queue.",
+        evidence: "A determination of retail service versus a PJM transmission request, or both.",
+        blocker: "No study exists. Describing a queue position now would be invented.",
+        note: "In a bilateral state there may be no ISO step at all.",
+      },
+      {
+        id: "infrastructure",
+        title: "Infrastructure, if a study requires it",
+        responsible: "UNKNOWN",
+        depends: "The process in the previous step. It cannot be scoped from this model.",
+        evidence: "A study that names facilities, an in-service date, and who builds them.",
+        blocker: "The model depends on a substation around 2030. That dependency is unverified.",
+        note: "Some loads are served with no new substation. Do not assume this step always exists.",
+      },
+      {
+        id: "supply",
+        title: "New supply, only if service requires it",
+        responsible: "UNKNOWN",
+        depends: "A finding that system power cannot serve the load.",
+        evidence: "That finding, plus a developer and a site for the equipment.",
+        blocker: "The finding does not exist. The 35 MW and 15 MW sketches are not projects.",
+        note: "Generation is a different project from utility service. Many loads never take this step.",
+      },
+      {
+        id: "commercial",
+        title: "Choose a commercial structure",
+        responsible: "UNKNOWN",
+        depends: "Knowing who would sell service, who would build, and who would pay.",
+        evidence: "A term sheet that names the signer on each side.",
+        blocker: "Contract signer, budget owner, and economic buyer are UNKNOWN.",
+        note: "A tariff, a PPA, and a contribution in aid of construction are different structures. They are not one sequence.",
+      },
+      {
+        id: "energized",
+        title: "Energize",
+        responsible: "Dominion, after the approvals that actually apply",
+        depends: "Whichever of the steps above a real study says are required. Not all of them.",
+        evidence: "Permission to energize.",
+        blocker: "The pathway model estimates Q3 2030 and about 90 MW. Neither figure is a commitment, and neither is 100 MW of available capacity.",
+        note: "The searched date can be earlier than anything the utility has said. The utility has said nothing.",
+      },
+    ],
+  },
 };
 
-function rewrite(value: string, map: [string, string][]) {
-  return map.reduce((s, [from, to]) => s.split(from).join(to), value);
-}
-
-function retitle<T>(value: T, map: [string, string][]): T {
-  if (typeof value === "string") return rewrite(value, map) as T;
-  if (Array.isArray(value)) return value.map((item) => retitle(item, map)) as T;
-  if (value && typeof value === "object") {
-    const next: Record<string, unknown> = {};
-    for (const [key, item] of Object.entries(value)) next[key] = retitle(item, map);
-    return next as T;
-  }
-  return value;
-}
-
-function variant(
-  base: Discovery,
-  patch: Partial<Discovery> & { projectName: string },
-  map: [string, string][],
-): Discovery {
-  return retitle({ ...base, ...patch }, map);
-}
-
-const OH_MAP: [string, string][] = [
-  ["PPL Electric Utilities", "AEP Ohio"],
-  ["PPL", "AEP Ohio"],
-  ["128-week", "unspecified"],
-];
-
-const VA_MAP: [string, string][] = [
-  ["PPL Electric Utilities", "Dominion Energy Virginia"],
-  ["PPL", "Dominion"],
-  ["128-week", "unspecified"],
-];
-
-const NC_MAP: [string, string][] = [
-  ["PPL Electric Utilities", "Duke Energy Progress"],
-  ["PJM and PPL", "Duke"],
-  ["PPL", "Duke"],
-  ["PJM", "no regional ISO"],
-  ["128-week", "unspecified"],
-];
-
-const TX_MAP: [string, string][] = [
-  ["PPL Electric Utilities", "Oncor"],
-  ["PPL", "Oncor"],
-  ["PJM", "ERCOT"],
-  ["128-week", "unspecified"],
-];
-
-export const DISCOVERY: Record<string, Discovery> = {
-  "pa-luzerne": PA,
-  "oh-licking": variant(PA, {
-    projectName: "Project Nova",
-    nextDecision: "Whether AEP Ohio will treat 75 MW as a routine load or a system problem",
-    firmMw: "50 MW",
-    flexMw: "25 MW",
-    siteControl: "Unknown",
-    credit: "Unknown",
-    utilityEngagement: "Described as started — no record in this demo",
-    ramp: [
-      { when: "2028", mw: "25 MW" },
-      { when: "2029", mw: "75 MW" },
-    ],
+function sketch(nextDecision: string, utility: string, market: string): Discovery {
+  return {
+    nextDecision,
     demand: [
-      { label: "Who needs the power", value: "Project Nova, a modeled industrial load", certainty: "Requires verification" },
-      { label: "Load", value: "75 MW requested", certainty: "Estimated" },
-      { label: "Site control", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Financing", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Load ramp", value: "Two steps, modeled", certainty: "Estimated" },
-      { label: "Firm vs flexible", value: "50 / 25 MW split is an assumption", certainty: "Estimated" },
+      { label: "Who needs the power", value: "Not named in this demo.", certainty: "Unknown" },
+      { label: "Requirement", value: "The searched megawatts. Not a customer load letter.", certainty: "Unverified" },
     ],
     grid: [
-      { label: "Utility", value: "AEP Ohio", certainty: "Known" },
-      { label: "ISO/RTO", value: "PJM", certainty: "Known" },
-      { label: "Studies", value: "Not identified", certainty: "Unknown" },
-      { label: "Upgrades", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Authority to say yes", value: UNKNOWN, certainty: "Unknown" },
-    ],
-  }, OH_MAP),
-  "va-louisa": variant(PA, {
-    projectName: "Project Dominion",
-    nextDecision: "Whether a 90 MW load in this zone is even in the current planning window",
-    firmMw: "70 MW",
-    flexMw: "20 MW",
-    siteControl: "Unknown",
-    utilityEngagement: "Unknown",
-    ramp: [
-      { when: "2029", mw: "30 MW" },
-      { when: "2030", mw: "90 MW" },
-    ],
-    demand: [
-      { label: "Who needs the power", value: "Unnamed. Virginia is the hardest place in this set to treat as available", certainty: "Unknown" },
-      { label: "Load", value: "90 MW modeled deliverable against a later date", certainty: "Estimated" },
-      { label: "Site control", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Financing", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Load ramp", value: "Modeled", certainty: "Estimated" },
-      { label: "Firm vs flexible", value: "Assumption", certainty: "Estimated" },
-    ],
-    grid: [
-      { label: "Utility", value: "Dominion Energy Virginia", certainty: "Known" },
-      { label: "ISO/RTO", value: "PJM, DOM zone", certainty: "Known" },
-      { label: "Studies", value: "Unknown which queue or retail process applies", certainty: "Unknown" },
-      { label: "Upgrades", value: "Widely described as constrained. Not sized for this site", certainty: "Estimated" },
-      { label: "Authority to say yes", value: UNKNOWN, certainty: "Unknown" },
-    ],
-  }, VA_MAP),
-  "nc-person": variant(PA, {
-    projectName: "Project Person",
-    nextDecision: "Who at Duke would even take a bilateral conversation",
-    firmMw: "80 MW",
-    flexMw: "30 MW",
-    siteControl: "Unknown",
-    utilityEngagement: "Unknown",
-    ramp: [
-      { when: "2028", mw: "40 MW" },
-      { when: "2029", mw: "110 MW" },
-    ],
-    grid: [
-      { label: "Utility", value: "Duke Energy Progress", certainty: "Known" },
-      { label: "ISO/RTO", value: "None. Bilateral Carolinas territory", certainty: "Known" },
-      { label: "Studies", value: "Utility process, not an ISO queue. Steps unknown", certainty: "Unknown" },
-      { label: "Upgrades", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Authority to say yes", value: "A Duke negotiator — not identified", certainty: "Unknown" },
-    ],
-    demand: [
-      { label: "Who needs the power", value: "Unnamed", certainty: "Unknown" },
-      { label: "Load", value: "110 MW modeled", certainty: "Estimated" },
-      { label: "Site control", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Financing", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Load ramp", value: "Modeled", certainty: "Estimated" },
-      { label: "Firm vs flexible", value: "Assumption", certainty: "Estimated" },
-    ],
-  }, NC_MAP),
-  "tx-taylor": variant(PA, {
-    projectName: "Project Orion",
-    nextDecision: "Whether 200 MW is a retail load, a large-load interconnection, or both",
-    firmMw: "140 MW",
-    flexMw: "60 MW",
-    siteControl: "Described, not verified",
-    credit: "Unknown",
-    utilityEngagement: "Unknown",
-    ramp: [
-      { when: "2027", mw: "50 MW" },
-      { when: "2028", mw: "200 MW" },
-    ],
-    demand: [
-      { label: "Who needs the power", value: "Project Orion, modeled", certainty: "Requires verification" },
-      { label: "Load", value: "200 MW modeled as deliverable", certainty: "Estimated" },
-      { label: "Site control", value: "Described, not in evidence", certainty: "Requires verification" },
-      { label: "Financing", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Load ramp", value: "Modeled", certainty: "Estimated" },
-      { label: "Firm vs flexible", value: "140 / 60 is an assumption", certainty: "Estimated" },
-    ],
-    grid: [
-      { label: "Utility", value: "Oncor, in this model", certainty: "Requires verification" },
-      { label: "ISO/RTO", value: "ERCOT", certainty: "Known" },
-      { label: "Studies", value: "Large-load process versus standard interconnection — not chosen", certainty: "Unknown" },
-      { label: "Upgrades", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Authority to say yes", value: "Split between the utility and ERCOT. Boundary unknown", certainty: "Unknown" },
+      { label: "Utility in the model", value: utility, certainty: "Unverified" },
+      { label: "Market in the model", value: market, certainty: "Unverified" },
+      { label: "Studies", value: "None", certainty: "Unknown" },
     ],
     supply: [
-      { label: "Existing generation", value: "ERCOT is an energy-only market. A PPA is commercial, not a right to deliver", certainty: "Known" },
-      { label: "New generation", value: "Whether this site needs dedicated generation", certainty: "Unknown" },
-      { label: "Storage", value: "40 MW modeled", certainty: "Estimated" },
-      { label: "Who builds it", value: UNKNOWN, certainty: "Unknown" },
-      { label: "Land and equipment", value: "Not verified", certainty: "Requires verification" },
+      { label: "Who would build", value: UNKNOWN, certainty: "Unknown" },
     ],
-  }, TX_MAP),
+    ramp: [],
+    firmMw: UNKNOWN,
+    flexMw: UNKNOWN,
+    term: UNKNOWN,
+    siteControl: UNKNOWN,
+    credit: UNKNOWN,
+    utilityEngagement: UNKNOWN,
+  };
+}
+
+export const DISCOVERY: Record<string, Discovery> = {
+  "va-louisa": VIRGINIA,
+  "pa-luzerne": sketch(
+    "Whether anyone has asked PPL to study this load",
+    "PPL Electric Utilities",
+    "PJM",
+  ),
+  "oh-licking": sketch(
+    "Whether AEP Ohio has been asked to look at this load",
+    "AEP Ohio",
+    "PJM",
+  ),
+  "nc-person": sketch(
+    "Who at Duke would take a bilateral conversation",
+    "Duke Energy Progress",
+    "No ISO — bilateral Carolinas",
+  ),
+  "tx-taylor": sketch(
+    "Whether this would be retail service, a large-load interconnection, or both",
+    "Oncor, in the model",
+    "ERCOT",
+  ),
 };
 
 export function getDiscovery(id: string): Discovery | undefined {
   return DISCOVERY[id];
 }
-
-export const RESEARCH_PROMPTS: Record<string, { assumption: string; validateWith: string; disprove: string }> = {
-  search: {
-    assumption: "A buyer can learn something true about energization by comparing pathways, before they have talked to a utility.",
-    validateWith: "Director of power at a data-center developer. Utility key-account lead.",
-    disprove: "Serious buyers already know the pathway is meaningless until the utility opens a study, and they do not shop it.",
-  },
-  pathway: {
-    assumption: "The binding question is who owns the next decision, not where the power plants are.",
-    validateWith: "Interconnection manager. Site-selection lead. Project finance.",
-    disprove: "Participants say the owner, the signer and the grid authority are already obvious, and the uncertainty is only cost.",
-  },
-  request: {
-    assumption: "A standardized requirement is something more than one party would actually respond to.",
-    validateWith: "Utility large-load team. IPP origination. A customer’s internal counsel.",
-    disprove: "Every party already has its own form, and a Kilo document would be ignored.",
-  },
-  market: {
-    assumption: "A live wholesale print is useful next to a delivery problem, and people can tell them apart.",
-    validateWith: "Energy trader at a hyperscaler. Utility rates analyst.",
-    disprove: "Buyers treat the wholesale price as the delivered price, and showing both creates false confidence.",
-  },
-};

@@ -29,8 +29,9 @@ export const PERSPECTIVES: {
 ];
 
 export interface ResearchNote {
-  learned: string;
-  confidence: string;
+  findings: string;
+  assumptions: string;
+  willingness: string;
 }
 
 interface DiscoveryState {
@@ -54,7 +55,17 @@ export function DiscoveryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(NOTES_KEY);
-      if (raw) setNotes(JSON.parse(raw) as Record<string, ResearchNote>);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Record<string, Partial<ResearchNote>>;
+      const notes: Record<string, ResearchNote> = {};
+      for (const [screen, note] of Object.entries(parsed)) {
+        notes[screen] = {
+          findings: note.findings ?? "",
+          assumptions: note.assumptions ?? "",
+          willingness: note.willingness ?? "",
+        };
+      }
+      setNotes(notes);
     } catch {
       /* empty notes are fine */
     }

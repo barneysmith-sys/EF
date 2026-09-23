@@ -144,7 +144,14 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
             </aside>
           </header>
 
-          {discovery && <ProjectWorkspace pathway={p} discovery={discovery} />}
+          {discovery?.workspace && (
+            <ProjectWorkspace
+              pathway={p}
+              workspace={discovery.workspace}
+              requestedMw={criteria.mw}
+              requiredBy={qLabel(criteria.requiredByIndex)}
+            />
+          )}
 
           {/* ───────── Status checklist ───────── */}
           <section className="dchecklist">

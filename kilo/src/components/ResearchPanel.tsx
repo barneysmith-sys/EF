@@ -1,54 +1,50 @@
 import { useState } from "react";
-import { RESEARCH_PROMPTS } from "../data/discovery";
 import { useDiscovery } from "./DiscoveryContext";
+
+const EMPTY = { findings: "", assumptions: "", willingness: "" };
 
 export default function ResearchPanel({ screen }: { screen: string }) {
   const { research, notes, setNote } = useDiscovery();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   if (!research) return null;
 
-  const prompt = RESEARCH_PROMPTS[screen] ?? RESEARCH_PROMPTS.search;
-  const note = notes[screen] ?? { learned: "", confidence: "Untested" };
+  const note = notes[screen] ?? EMPTY;
 
   return (
     <aside className={`research${open ? " open" : ""}`}>
-      <button className="research-bar" onClick={() => setOpen((v) => !v)}>
-        <span className="mlabel">Research mode</span>
-        <span>{prompt.assumption}</span>
+      <button className="research-bar" onClick={() => setOpen((value) => !value)}>
+        <span className="mlabel">Research notes</span>
+        <span>Interview findings stay off the customer view until this is opened.</span>
         <span className="mono">{open ? "HIDE" : "OPEN"}</span>
       </button>
       {open && (
         <div className="research-body">
-          <div>
-            <div className="mlabel">Assumption being tested</div>
-            <p>{prompt.assumption}</p>
-          </div>
-          <div>
-            <div className="mlabel">Who I need to ask</div>
-            <p>{prompt.validateWith}</p>
-          </div>
-          <div>
-            <div className="mlabel">What would prove this wrong</div>
-            <p>{prompt.disprove}</p>
-          </div>
+          <p className="research-hypothesis">
+            Unverified hypothesis: several parties share authority over energizing a large load, and it is not yet known who would pay to coordinate them.
+          </p>
           <label>
-            <span className="mlabel">What I learned</span>
+            <span className="mlabel">Interview findings</span>
             <textarea
-              value={note.learned}
-              placeholder="Unknown until a conversation happens."
-              onChange={(e) => setNote(screen, { ...note, learned: e.target.value })}
+              value={note.findings}
+              placeholder="Who said what. Leave blank until a conversation happens."
+              onChange={(event) => setNote(screen, { ...note, findings: event.target.value })}
             />
           </label>
           <label>
-            <span className="mlabel">Confidence in assumption</span>
-            <select
-              value={note.confidence}
-              onChange={(e) => setNote(screen, { ...note, confidence: e.target.value })}
-            >
-              {["Untested", "Low", "Medium", "High", "Disproved"].map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
+            <span className="mlabel">Unverified assumptions</span>
+            <textarea
+              value={note.assumptions}
+              placeholder="What this screen is assuming, and what would prove it wrong."
+              onChange={(event) => setNote(screen, { ...note, assumptions: event.target.value })}
+            />
+          </label>
+          <label>
+            <span className="mlabel">Willingness to pay</span>
+            <textarea
+              value={note.willingness}
+              placeholder="Who felt the pain, and whether they would pay. UNKNOWN is a valid note."
+              onChange={(event) => setNote(screen, { ...note, willingness: event.target.value })}
+            />
           </label>
         </div>
       )}
