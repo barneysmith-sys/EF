@@ -173,7 +173,7 @@ export default function UsMap({
               {active.p.energization} · ${active.p.priceLow}–{active.p.priceHigh}/MWh
             </text>
             <text x="11" y="67" className="callout-sub num">
-              {active.p.confidence}% confidence · {active.p.utility}
+              Modeled sketch · {active.p.utility}
             </text>
           </g>
         )}

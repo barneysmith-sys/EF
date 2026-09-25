@@ -1,4 +1,4 @@
-import { ConfidenceMeter, MixBar, StatusMarkIcon } from "./ui";
+import { MixBar, StatusMarkIcon } from "./ui";
 import type { ScoredPathway } from "../lib/search";
 import { getDiscovery } from "../data/discovery";
 import { EvidenceBadge } from "./evidence/EvidenceBadge";
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function ResultCard({ scored, selected, onHover, onSelect, onOpen }: Props) {
-  const { pathway: p, rank, fit, meetsDate, meetsMw, quartersLate, mwShortfall } = scored;
+  const { pathway: p, rank, fit, meetsMw, mwShortfall } = scored;
   const discovery = getDiscovery(p.id);
   const { perspective } = useDiscovery();
   const view = PERSPECTIVES.find((item) => item.id === perspective) ?? PERSPECTIVES[0];
@@ -62,11 +62,9 @@ export default function ResultCard({ scored, selected, onHover, onSelect, onOpen
         </div>
         <div className="rh-div" />
         <div className="rh-item">
-          <div className="mlabel">Energization</div>
-          <div className={`rh-val num${meetsDate ? "" : " warn"}`}>{p.energization}</div>
-          <div className={`rh-note num${meetsDate ? " ok" : " warn"}`}>
-            {meetsDate ? "On or before requirement" : `${quartersLate} qtr${quartersLate > 1 ? "s" : ""} late`}
-          </div>
+          <div className="mlabel">Modeled date</div>
+          <div className="rh-val num">{p.energization}</div>
+          <div className="rh-note">Not a confirmed energization date</div>
         </div>
         <div className="rh-div" />
         <div className="rh-item">
@@ -79,11 +77,9 @@ export default function ResultCard({ scored, selected, onHover, onSelect, onOpen
         </div>
         <div className="rh-div" />
         <div className="rh-item">
-          <div className="mlabel">Confidence</div>
-          <div className="rh-conf">
-            <ConfidenceMeter value={p.confidence} width={58} />
-          </div>
-          <div className="rh-note">{p.reliabilityTier}</div>
+          <div className="mlabel">Project-specific</div>
+          <div className="rh-val unknown">Unknown</div>
+          <div className="rh-note">Not available capacity</div>
         </div>
       </div>
 

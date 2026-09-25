@@ -1,0 +1,182 @@
+.atlas {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  min-height: 0;
+  height: 100%;
+}
+.atlas-nav {
+  border-right: 1px solid var(--line);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+.atlas-nav nav {
+  display: flex;
+  flex-direction: column;
+}
+.atlas-nav nav button {
+  text-align: left;
+  padding: 6px 0;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+}
+.atlas-nav nav button.active {
+  color: var(--text-primary);
+}
+.atlas-name {
+  font-family: var(--serif, "Newsreader", serif);
+  font-size: 22px;
+}
+.atlas-main {
+  overflow: auto;
+  padding: 0 0 32px;
+}
+.atlas-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--bg-base);
+  z-index: 2;
+}
+.strip {
+  text-align: left;
+  padding: 10px 12px;
+  border-right: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
+}
+.strip strong {
+  font-weight: 500;
+  font-size: 13px;
+}
+.atlas-grid, .atlas-stack, .atlas-split {
+  padding: 16px 18px 0;
+  display: grid;
+  gap: 16px;
+}
+.atlas-grid {
+  grid-template-columns: 1fr 1fr;
+}
+.atlas-split {
+  grid-template-columns: 280px 1fr;
+  align-items: start;
+}
+.atlas h2, .atlas h3 {
+  font-family: var(--serif, "Newsreader", serif);
+  font-weight: 450;
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.atlas h3 { font-size: 15px; }
+.atlas p { margin: 0 0 8px; font-size: 13px; color: var(--text-secondary); }
+.quiet { color: var(--text-tertiary); }
+.decision-title { color: var(--text-primary); font-size: 16px; }
+.text-btn {
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+.blocker-list, .activity-list, .stage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.blocker-list button, .stage-list button {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-secondary);
+  font-size: 12.5px;
+}
+.stage-list button.active { color: var(--text-primary); }
+.field, .field-read {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.field input, .field select, .founder input, .founder select, .founder textarea {
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  padding: 6px 8px;
+  font: inherit;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.scenario-row, .packet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.scenario-row button {
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.scenario-row button.active { color: var(--text-primary); }
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ledger td, .ledger th {
+  text-align: left;
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  font-weight: 400;
+}
+.packet {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.founder { display: grid; gap: 6px; }
+.interview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.interview-bar input {
+  border: 1px solid var(--line);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  padding: 4px 6px;
+  font: inherit;
+}
+.memo { max-width: 760px; }
+@media print {
+  .atlas-nav, .topbar, .atlas-strip, .interview-bar, .research-panel { display: none; }
+  .atlas { display: block; }
+}
+.activity-list li { display: grid; gap: 2px; font-size: 12.5px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.portfolio-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.portfolio-table th, .portfolio-table td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); font-weight: 400; }
+.portfolio-table button { color: var(--text-primary); }
+.portfolio-tools { display: flex; gap: 8px; margin-bottom: 12px; }
+.portfolio-tools select { border: 1px solid var(--line); background: var(--bg-base); color: var(--text-primary); padding: 4px 6px; }
+@media (max-width: 1100px) {
+  .atlas { grid-template-columns: 1fr; }
+  .atlas-strip, .atlas-grid, .atlas-split, .form-grid { grid-template-columns: 1fr; }
+}

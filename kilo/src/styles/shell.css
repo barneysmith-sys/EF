@@ -640,6 +640,10 @@
   flex-direction: column;
   animation: kilo-fade 0.24s ease;
 }
+.app-body > .atlas {
+  flex: 1;
+  min-height: 0;
+}
 
 /* Sub-header used on every interior page */
 .subbar {

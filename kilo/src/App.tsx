@@ -13,7 +13,9 @@ import { useLiveBoard } from "./components/LiveTape";
 import { DiscoveryProvider, PERSPECTIVES, useDiscovery } from "./components/DiscoveryContext";
 import ResearchPanel from "./components/ResearchPanel";
 import ResearchDesk from "./components/ResearchDesk";
+import AtlasWorkspace from "./components/atlas/AtlasWorkspace";
 import { track } from "./lib/analytics";
+import type { AtlasSection } from "./domain/types";
 
 export type Route =
   | { name: "landing" }
@@ -21,14 +23,15 @@ export type Route =
   | { name: "pathway"; id: string }
   | { name: "request"; pathwayId: string }
   | { name: "projects" }
+  | { name: "project"; id: string; section: AtlasSection }
   | { name: "market" }
   | { name: "requests" }
   | { name: "research" };
 
 const NAV: { key: Route["name"]; label: string; badge?: string }[] = [
   { key: "search", label: "Search" },
-  { key: "projects", label: "Projects", badge: String(PROJECTS.length) },
-  { key: "market", label: "Market" },
+  { key: "projects", label: "Portfolio", badge: String(PROJECTS.length) },
+  { key: "market", label: "Intelligence" },
   { key: "requests", label: "Requests", badge: String(REQUESTS.filter((r) => r.status !== "Closed").length) },
 ];
 
@@ -125,6 +128,7 @@ function AppChrome({
           {NAV.map((n) => {
             const active =
               route.name === n.key ||
+              (n.key === "projects" && route.name === "project") ||
               (n.key === "search" && (route.name === "pathway" || route.name === "request"));
             return (
               <button
@@ -205,6 +209,7 @@ function AppChrome({
             criteria={criteria}
             onBack={() => setRoute({ name: "search" })}
             onRequestCapacity={() => setRoute({ name: "request", pathwayId: route.id })}
+            onOpenProject={(id) => setRoute({ name: "project", id, section: "overview" })}
           />
         )}
 
@@ -219,8 +224,17 @@ function AppChrome({
 
         {route.name === "projects" && (
           <ProjectsView
-            onOpenPathway={(id) => setRoute({ name: "pathway", id })}
+            onOpenProject={(id) => setRoute({ name: "project", id, section: "overview" })}
             onNewSearch={() => setRoute({ name: "landing" })}
+          />
+        )}
+
+        {route.name === "project" && (
+          <AtlasWorkspace
+            projectId={route.id}
+            section={route.section}
+            onSection={(section) => setRoute({ name: "project", id: route.id, section })}
+            onClose={() => setRoute({ name: "projects" })}
           />
         )}
 

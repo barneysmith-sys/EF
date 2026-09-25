@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { track } from "../lib/analytics";
+import { useProjects } from "../domain/store";
 
-const HYPOTHESIS =
-  "Data-center power teams cannot name an executable energization date before they commit site capital.";
+const HYPOTHESES = [
+  "H1. Power-development teams struggle to produce a defensible power case before site capital is committed. UNTESTED.",
+  "H2. The person who builds the power case may not be the economic buyer. UNTESTED.",
+  "H3. Utility engagement and project-specific evidence are a bottleneck for a credible date. UNTESTED.",
+  "H4. Teams use spreadsheets, email, consultants, and documents. UNTESTED.",
+  "H5. The value may be better capital decisions, not public grid data. UNTESTED.",
+  "H6. Utilities may have a mirror problem judging whether a large load is credible. UNTESTED.",
+  "H7. Power economics may be hard enough that teams already pay someone to model them. UNTESTED.",
+];
 
 interface Interview {
   role: string;
@@ -25,6 +33,7 @@ const EMPTY: Interview = {
 };
 
 export default function ResearchDesk({ onBack }: { onBack: () => void }) {
+  const { notes } = useProjects();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [draft, setDraft] = useState<Interview>(EMPTY);
   const n = interviews.length;
@@ -46,8 +55,17 @@ export default function ResearchDesk({ onBack }: { onBack: () => void }) {
       </div>
       <div className="page">
         <div className="page-inner research-desk">
-          <p className="ws-lead">{HYPOTHESIS}</p>
-          <p className="ws-lead">Confidence: UNTESTED. Sample size {n}.</p>
+          <ul className="must">
+            {HYPOTHESES.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <p className="ws-lead">Interviews {n}. Observations {notes.length}. Supported hypotheses 0. Contradicted hypotheses 0. Notes are not conclusions.</p>
+          {notes.length > 0 && (
+            <ul className="must">
+              {notes.map((item) => (
+                <li key={item.id}>{item.kind} · {item.module} · {item.note}</li>
+              ))}
+            </ul>
+          )}
           <section className="ws-block">
             <div className="mlabel">What we believe now</div>
             {n === 0 ? (

@@ -147,7 +147,7 @@ export default function FilterRail({ filters, onChange, onReset, shown, total }:
         />
 
         <Slider
-          label="Minimum confidence"
+          label="Modeled score floor"
           value={filters.minConfidence}
           min={0}
           max={95}

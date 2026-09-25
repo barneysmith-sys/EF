@@ -123,11 +123,11 @@ export function applyFilters(scored: ScoredPathway[], f: Filters): ScoredPathway
 export type SortKey = "fit" | "date" | "price" | "mw" | "confidence";
 
 export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: "fit", label: "Best match" },
-  { value: "date", label: "Soonest" },
-  { value: "price", label: "Cheapest" },
-  { value: "mw", label: "Largest" },
-  { value: "confidence", label: "Most certain" },
+  { value: "fit", label: "Modeled fit" },
+  { value: "date", label: "Sketch date" },
+  { value: "price", label: "Sketch price" },
+  { value: "mw", label: "Sketch MW" },
+  { value: "confidence", label: "Modeled score" },
 ];
 
 export function sortPathways(list: ScoredPathway[], key: SortKey): ScoredPathway[] {

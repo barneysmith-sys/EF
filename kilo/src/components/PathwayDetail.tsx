@@ -5,7 +5,6 @@ import Gantt from "./Gantt";
 import UsMap from "./UsMap";
 import {
   Button,
-  ConfidenceMeter,
   MixBar,
   SectionHead,
   StatusDot,
@@ -21,14 +20,21 @@ import { geographyById } from "../lib/geo";
 import type { SearchCriteria } from "../lib/search";
 import type { Section } from "../data/types";
 
+const PATHWAY_PROJECT: Record<string, string> = {
+  "va-louisa": "atlas",
+  "oh-licking": "nova",
+  "tx-taylor": "orion",
+};
+
 interface Props {
   id: string;
   criteria: SearchCriteria;
   onBack: () => void;
   onRequestCapacity: () => void;
+  onOpenProject?: (id: string) => void;
 }
 
-export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity }: Props) {
+export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity, onOpenProject }: Props) {
   const p = getPathway(id);
   const discovery = p ? getDiscovery(p.id) : undefined;
   const [openSection, setOpenSection] = useState<string | null>(p?.sections[0]?.key ?? null);
@@ -55,6 +61,11 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
         <WorkflowRail active="Verify" compact />
         <span className="topbar-sep" />
         <span className="demo-chip">Demo data</span>
+        {onOpenProject && PATHWAY_PROJECT[p.id] && (
+          <Button size="sm" onClick={() => onOpenProject(PATHWAY_PROJECT[p.id])}>
+            Open project
+          </Button>
+        )}
         <Button variant="primary" size="sm" onClick={onRequestCapacity}>
           Create power requirement →
         </Button>
@@ -77,25 +88,22 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
                     {p.deliverableMw}
                     <span className="dfig-unit">MW</span>
                   </div>
-                  <div className="mlabel">Estimated deliverable</div>
+                  <div className="mlabel">Modeled sketch, not confirmed</div>
                 </div>
                 <div className="dfig-div" />
                 <div className="dfig">
-                  <div className="dfig-value num">{p.state}</div>
-                  <div className="mlabel">{p.locality}</div>
+                  <div className="dfig-value num unknown">Unknown</div>
+                  <div className="mlabel">Utility-confirmed MW</div>
                 </div>
                 <div className="dfig-div" />
                 <div className="dfig">
-                  <div className={`dfig-value num${meetsDate ? "" : " warn"}`}>{p.energization}</div>
-                  <div className="mlabel">Target energization</div>
+                  <div className="dfig-value num">{qLabel(criteria.requiredByIndex)}</div>
+                  <div className="mlabel">Customer target, not a date</div>
                 </div>
                 <div className="dfig-div" />
                 <div className="dfig">
-                  <div className="dfig-value num">
-                    {p.confidence}
-                    <span className="dfig-unit">%</span>
-                  </div>
-                  <div className="mlabel">Pathway confidence</div>
+                  <div className="dfig-value num unknown">Unknown</div>
+                  <div className="mlabel">Earliest supported energization</div>
                 </div>
               </div>
 
@@ -124,11 +132,9 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
                   <span className="dside-val">{p.reliabilityTier}</span>
                 </div>
                 <div className="dside-row">
-                  <span className="mlabel">Vs. requirement</span>
-                  <span className={`dside-val num ${meetsDate ? "ok" : "warn"}`}>
-                    {meetsDate
-                      ? `${Math.abs(quartersLate)} qtr float`
-                      : `${quartersLate} qtr late`}
+                  <span className="mlabel">Sketch vs request</span>
+                  <span className="dside-val">
+                    Sketch says {p.energization}. That is not a supported date.
                   </span>
                 </div>
                 <div className="dside-mix">
@@ -253,7 +259,7 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
               <div className="dblock" id="timeline">
                 <SectionHead
                   eyebrow="Timeline"
-                  title="Critical path to first megawatt"
+                  title="Modeled schedule, not a supported date"
                   right={
                     <span className={`dblock-headline num ${meetsDate ? "ok" : "warn"}`}>
                       {p.scheduleNote}
@@ -360,28 +366,9 @@ export default function PathwayDetail({ id, criteria, onBack, onRequestCapacity 
                 <EvidencePanel evidence={p.evidence} />
 
                 <div className="dconf panel">
-                  <div className="mlabel">Confidence composition</div>
-                  <div className="dconf-total">
-                    <span className="num">{p.confidence}%</span>
-                    <ConfidenceMeter value={p.confidence} showLabel={false} width={100} />
-                  </div>
-                  <div className="dconf-list">
-                    {p.sections.slice(0, 9).map((s) => (
-                      <div className="dconf-row" key={s.key}>
-                        <span className="dconf-label">{s.title}</span>
-                        <span className="dconf-track">
-                          <span
-                            className={`dconf-fill ${s.confidence >= 80 ? "high" : s.confidence >= 65 ? "mid" : "low"}`}
-                            style={{ width: `${s.confidence}%` }}
-                          />
-                        </span>
-                        <span className="dconf-val num">{s.confidence}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <div className="mlabel">Candidate pathway</div>
                   <div className="dconf-note">
-                    Pathway confidence is the evidence-weighted blend of the section scores above.
-                    Illustrative only.
+                    This is a candidate pathway for investigation, not available capacity. Modeled megawatts, sketch dates, and section scores are not utility confirmation.
                   </div>
                 </div>
 
@@ -429,7 +416,6 @@ function SectionBlock({
   onToggle: () => void;
   evidenceTitles: { id: string; title: string }[];
 }) {
-  const tone = section.confidence >= 80 ? "high" : section.confidence >= 65 ? "mid" : "low";
   const warnCount = section.rows.filter((r) => r.status === "warn" || r.status === "risk").length;
 
   return (
@@ -446,7 +432,7 @@ function SectionBlock({
             <span className="num">{warnCount}</span>
           </span>
         )}
-        <span className={`dsection-conf num ${tone}`}>{section.confidence}%</span>
+        <span className="dsection-conf">Modeled</span>
       </button>
 
       {open && (

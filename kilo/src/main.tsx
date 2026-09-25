@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { ProjectProvider } from "./domain/store";
 
 import "./styles/tokens.css";
 import "./styles/shell.css";
@@ -13,9 +14,12 @@ import "./styles/request.css";
 import "./styles/pages.css";
 import "./styles/live.css";
 import "./styles/discovery.css";
+import "./styles/atlas.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <ProjectProvider>
+      <App />
+    </ProjectProvider>
   </StrictMode>,
 );
