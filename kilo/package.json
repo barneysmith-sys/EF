@@ -9,6 +9,7 @@
     "build:pages": "GITHUB_PAGES=true npm run build",
     "deploy": "npm run build:pages && bash scripts/deploy-pages.sh",
     "lint": "oxlint",
+    "test": "node --experimental-strip-types --test src/lib/evidence/claims.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

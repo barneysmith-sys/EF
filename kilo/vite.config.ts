@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { marketApi } from './server/marketApi'
+import { marketApi } from './server/marketApi.js'
 
 // https://vite.dev/config/
 export default defineConfig({

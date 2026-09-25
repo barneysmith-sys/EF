@@ -1,6 +1,8 @@
 import { ConfidenceMeter, MixBar, StatusMarkIcon } from "./ui";
 import type { ScoredPathway } from "../lib/search";
 import { getDiscovery } from "../data/discovery";
+import { EvidenceBadge } from "./evidence/EvidenceBadge";
+import { ATLAS_CLAIMS } from "../lib/evidence/atlas";
 import { PERSPECTIVES, useDiscovery } from "./DiscoveryContext";
 
 interface Props {
@@ -51,7 +53,7 @@ export default function ResultCard({ scored, selected, onHover, onSelect, onOpen
       {/* The four numbers a buyer actually decides on */}
       <div className="rcard-headline">
         <div className="rh-item">
-          <div className="mlabel">Deliverable</div>
+          <div className="mlabel">Modeled deliverable <EvidenceBadge claim={p.id === "va-louisa" ? ATLAS_CLAIMS.modeledMw : { ...ATLAS_CLAIMS.modeledMw, value: String(p.deliverableMw), geographicScope: p.state, notes: "Pathway sketch. Not utility-confirmed capacity." }} /></div>
           <div className={`rh-val num${meetsMw ? "" : " warn"}`}>
             {p.deliverableMw}
             <span className="rh-unit">MW</span>

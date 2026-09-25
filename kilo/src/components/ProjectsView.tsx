@@ -22,10 +22,6 @@ export default function ProjectsView({
 
   const pathways = PROJECTS.map((p) => getPathway(p.pathwayId)).filter((p) => p !== undefined);
   const secured = PROJECTS.filter((p) => p.stage === "Securing Capacity").reduce((s, p) => s + p.mw, 0);
-  const avgConfidence = Math.round(
-    PROJECTS.reduce((s, p) => s + p.confidence * p.mw, 0) / PORTFOLIO_TOTAL_MW,
-  );
-
   return (
     <div className="pageview">
       <div className="subbar">
@@ -63,19 +59,19 @@ export default function ProjectsView({
                 <div className="pstat-sub">Project Orion, ERCOT West</div>
               </div>
               <div className="pstat">
-                <div className="mlabel">Weighted confidence</div>
-                <div className="pstat-val num">{avgConfidence}%</div>
-                <div className="pstat-sub">MW-weighted across the portfolio</div>
+                <div className="mlabel">Utility-confirmed MW</div>
+                <div className="pstat-val num">Unknown</div>
+                <div className="pstat-sub">No project has a utility letter</div>
               </div>
               <div className="pstat">
-                <div className="mlabel">Earliest energization</div>
-                <div className="pstat-val num">Q3 2028</div>
-                <div className="pstat-sub">Project Orion, 200 MW</div>
+                <div className="mlabel">Earliest supported date</div>
+                <div className="pstat-val num">Unknown</div>
+                <div className="pstat-sub">Modeled dates are not energization dates</div>
               </div>
               <div className="pstat">
-                <div className="mlabel">Committed capital</div>
-                <div className="pstat-val num">$85M</div>
-                <div className="pstat-sub">Across all projects to date</div>
+                <div className="mlabel">Capital at risk</div>
+                <div className="pstat-val num">Unknown</div>
+                <div className="pstat-sub">Not sourced from a contract</div>
               </div>
             </div>
           </header>

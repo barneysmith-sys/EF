@@ -12,6 +12,8 @@ import { PORTFOLIO_TOTAL_MW, PROJECTS, REQUESTS } from "./data/portfolio";
 import { useLiveBoard } from "./components/LiveTape";
 import { DiscoveryProvider, PERSPECTIVES, useDiscovery } from "./components/DiscoveryContext";
 import ResearchPanel from "./components/ResearchPanel";
+import ResearchDesk from "./components/ResearchDesk";
+import { track } from "./lib/analytics";
 
 export type Route =
   | { name: "landing" }
@@ -20,7 +22,8 @@ export type Route =
   | { name: "request"; pathwayId: string }
   | { name: "projects" }
   | { name: "market" }
-  | { name: "requests" };
+  | { name: "requests" }
+  | { name: "research" };
 
 const NAV: { key: Route["name"]; label: string; badge?: string }[] = [
   { key: "search", label: "Search" },
@@ -52,6 +55,7 @@ export default function App() {
     setTimeout(() => {
       setFilters(defaultFilters(criteria));
       setSearching(false);
+      track("search submitted");
       setRoute({ name: "search" });
     }, 1150);
   }, [criteria]);
@@ -99,7 +103,7 @@ function AppChrome({
   clock: Date;
   live: ReturnType<typeof useLiveBoard>["board"];
 }) {
-  const { perspective, setPerspective, research, setResearch } = useDiscovery();
+  const { perspective, setPerspective, research } = useDiscovery();
   const screen =
     route.name === "pathway" || route.name === "request" || route.name === "market" ? route.name : "search";
 
@@ -151,7 +155,7 @@ function AppChrome({
           </div>
           <button
             className={`research-toggle${research ? " on" : ""}`}
-            onClick={() => setResearch(!research)}
+            onClick={() => setRoute({ name: "research" })}
           >
             Research
           </button>
@@ -187,7 +191,10 @@ function AppChrome({
             filters={filters}
             onFilterChange={(next) => setFilters((f) => ({ ...f, ...next }))}
             onFilterReset={() => setFilters(defaultFilters(criteria))}
-            onOpenPathway={(id) => setRoute({ name: "pathway", id })}
+            onOpenPathway={(id) => {
+              track("pathway opened", id);
+              setRoute({ name: "pathway", id });
+            }}
             onEditSearch={() => setRoute({ name: "landing" })}
           />
         )}
@@ -218,6 +225,8 @@ function AppChrome({
         )}
 
         {route.name === "market" && <MarketView onSearch={() => setRoute({ name: "landing" })} />}
+
+        {route.name === "research" && <ResearchDesk onBack={() => setRoute({ name: "search" })} />}
 
         {route.name === "requests" && (
           <RequestsView

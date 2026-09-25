@@ -20,7 +20,7 @@ function send(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-async function readJson(url: string, headers?: HeadersInit): Promise<unknown> {
+async function readJson(url: string, headers?: Record<string, string>): Promise<unknown> {
   const res = await fetch(url, { headers });
   if (!res.ok) {
     const text = await res.text().catch(() => "");

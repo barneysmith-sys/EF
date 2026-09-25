@@ -97,7 +97,7 @@ const VIRGINIA: Discovery = {
   credit: "UNKNOWN",
   utilityEngagement: "Not started",
   workspace: {
-    projectName: "Virginia data-center requirement",
+    projectName: "Project Atlas",
     seats: SEATS,
     actors: [
       {

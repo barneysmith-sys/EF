@@ -33,7 +33,7 @@ export default function MarketView({ onSearch }: { onSearch: () => void }) {
           <LiveTape />
           <SectionHead
             eyebrow="Regional conditions"
-            title="Where megawatts are actually deliverable"
+            title="Market intelligence"
             right={
               <span className="market-asof mono">
                 INDICATIVE · MODELED FROM PUBLIC DATA · DEMO
@@ -129,59 +129,23 @@ export default function MarketView({ onSearch }: { onSearch: () => void }) {
                   <div className="num">{region.medianLagQuarters} quarters</div>
                   <div className="marketdetail-sub">Request to energization, median</div>
                 </div>
-                <div>
-                  <div className="mlabel">Deliverability score</div>
-                  <div className="num">{region.headroomScore}/100</div>
-                  <div className="marketdetail-sub">Blend of headroom, queue depth and lag</div>
-                </div>
-              </div>
-
-              <div className="scorebars">
-                {MARKET_REGIONS.map((r) => (
-                  <div className={`scorebar${r.code === region.code ? " active" : ""}`} key={r.code}>
-                    <span className="scorebar-label mono">{r.code}</span>
-                    <span className="scorebar-track">
-                      <span
-                        className={HEADROOM_TONE[r.headroom] || "neutral"}
-                        style={{ width: `${r.headroomScore}%` }}
-                      />
-                    </span>
-                    <span className="num scorebar-val">{r.headroomScore}</span>
-                  </div>
-                ))}
               </div>
             </div>
 
             <aside className="marketdetail-side panel">
-              <div className="mlabel">What the market is telling you</div>
+              <div className="mlabel">Known, changing, unknown</div>
               <ul className="marketinsights">
                 <li>
                   <span className="mi-num num">01</span>
-                  <span>
-                    The cheapest power and the fastest interconnection are in the same place —
-                    ERCOT — and so is the most settlement risk.
-                  </span>
+                  <span>Known: a region name and operator. That does not describe spare capacity.</span>
                 </li>
                 <li>
                   <span className="mi-num num">02</span>
-                  <span>
-                    Virginia has the deepest ecosystem and the worst deliverability. Proximity to
-                    Ashburn does not create megawatts.
-                  </span>
+                  <span>Changing: demand, generation mix, and wholesale prices, when a public source is connected. Those are not a customer rate.</span>
                 </li>
                 <li>
                   <span className="mi-num num">03</span>
-                  <span>
-                    Queue conversion is under 10% everywhere. Requested capacity is a poor proxy for
-                    capacity that will exist.
-                  </span>
-                </li>
-                <li>
-                  <span className="mi-num num">04</span>
-                  <span>
-                    Non-ISO territory trades a queue for a negotiation. The Carolinas move fast
-                    physically and slowly commercially.
-                  </span>
+                  <span>Project-specific and unknown: headroom, upgrades, study time, and an energization date. The table below is a demo sketch, not a ranking.</span>
                 </li>
               </ul>
               <div className="marketinsights-foot">

@@ -1,6 +1,10 @@
 import { useState } from "react";
 import type { Actor, PathStep, VirginiaWorkspace } from "../data/discovery";
 import type { Pathway } from "../data/types";
+import { ATLAS_CLAIMS, BOTTLENECK, COMMERCIAL, CONTROL, EVIDENCE_ROOM, MUST_BECOME_TRUE, READINESS } from "../lib/evidence/atlas";
+import { readinessState } from "../lib/evidence/types";
+import { EvidenceBadge } from "./evidence/EvidenceBadge";
+import { track } from "../lib/analytics";
 
 const DEAL = [
   { id: "customer", kicker: "Customer", question: "Who needs 100 MW, and who can sign for it?" },
@@ -26,6 +30,18 @@ export default function ProjectWorkspace({
 
   return (
     <div className="workspace">
+      <section className="ws-block path-brief" onClick={() => track("path to power opened")}>
+        <div className="mlabel">Path to power · demo</div>
+        <div className="brief-grid">
+          <div><span className="mlabel">Target energization</span><strong>{BOTTLENECK.target}</strong><EvidenceBadge claim={ATLAS_CLAIMS.targetDate} /></div>
+          <div><span className="mlabel">Earliest supported</span><strong className="unknown">{BOTTLENECK.earliest}</strong><EvidenceBadge claim={ATLAS_CLAIMS.earliestDate} /></div>
+          <div><span className="mlabel">Bottleneck</span><strong>{BOTTLENECK.bottleneck}</strong></div>
+          <div><span className="mlabel">Bottleneck owner</span><strong>{BOTTLENECK.owner}</strong></div>
+          <div><span className="mlabel">Next decision</span><strong>{BOTTLENECK.next}</strong></div>
+          <div><span className="mlabel">Who can unblock it</span><strong className="unknown">{BOTTLENECK.unblock}</strong></div>
+          <div><span className="mlabel">Capital at risk</span><strong className="unknown">{BOTTLENECK.capital}</strong></div>
+        </div>
+      </section>
       <header className="ws-head">
         <div>
           <div className="mlabel">Deal room · mock</div>
@@ -106,6 +122,72 @@ export default function ProjectWorkspace({
           </ol>
           {step && <StepCard step={step} />}
         </div>
+      </section>
+
+      <section className="ws-block">
+        <div className="mlabel">Readiness · not a score</div>
+        <div className="ready-grid">
+          {READINESS.map((dimension) => (
+            <div key={dimension.name}>
+              <div className="mlabel">{dimension.name}</div>
+              <strong className={readinessState(dimension.items) === "VERIFIED" ? "" : "unknown"}>
+                {readinessState(dimension.items)}
+              </strong>
+              <ul>
+                {dimension.items.map((item) => (
+                  <li key={item.label}>{item.label} · {item.mark}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="ws-block">
+        <div className="mlabel">What must become true</div>
+        <ul className="must">
+          {MUST_BECOME_TRUE.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="ws-block">
+        <div className="mlabel">Who controls what</div>
+        <table className="control">
+          <tbody>
+            {CONTROL.map((row) => (
+              <tr key={row.decision}>
+                <td>{row.decision}</td>
+                <td>{row.who}</td>
+                <td className={row.status === "UNKNOWN" ? "unknown" : ""}>{row.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="ws-block">
+        <div className="mlabel">Commercial terms · unsourced</div>
+        <table className="control">
+          <tbody>
+            {COMMERCIAL.map((row) => (
+              <tr key={row.field}>
+                <td>{row.field}</td>
+                <td className="unknown">{row.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="ws-block">
+        <div className="mlabel">Evidence room · nothing attached</div>
+        <ul className="must">
+          {EVIDENCE_ROOM.map((doc) => (
+            <li key={doc.type}>{doc.type} · {doc.status}</li>
+          ))}
+        </ul>
       </section>
     </div>
   );
